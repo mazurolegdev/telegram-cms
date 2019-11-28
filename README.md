@@ -7,3 +7,4 @@
 - git clone https://github.com/codefather-labs/Telegram-CMS.git
 - docker-compose build
 - docker-compose up
+- admin login/password (for demonstration) - root/7879
