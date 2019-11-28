@@ -1,0 +1,32 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+{% block submit_buttons_bottom %}
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<button class="btn btn-block btn-outline-secondary" type="submit" name="_send_message">
+    Отправить сообщение {{model}} <i class="fa fa-telegram" aria-hidden="true"></i>
+</button>
+
+<br>
+{{ block.super }}
+<!-- <div class=”submit-row list-group”>
+<button type=”button” title=”Cancel” class=”list-group-item active” name=”_cancel” onclick=”location.href=’/admin/order/project/’;”>
+    <button class="btn btn-primary">Сгенерировать публичный ключ</button>
+    <button class="btn btn-primary">Сгенерировать приватный ключ</button>
+</button>
+</div> -->
+{% endblock %}
+
+{% block form_top %}
+
+
+    <!-- <button class="btn btn-primary">Сгенерировать публичный ключ</button>
+    <button class="btn btn-primary">Сгенерировать приватный ключ</button>
+    <br><br> -->
+{% endblock %}
+
+

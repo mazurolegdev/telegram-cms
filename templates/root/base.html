@@ -1,0 +1,228 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title>Document</title>
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <!-- Animate CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <!-- Material Design Bootstrap -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.7/css/mdb.min.css" rel="stylesheet">
+</head>
+<div class="collapse" id="HistoryToggleContent">
+    <div class="bg-dark p-4">
+        <h4 class="text-white">Collapsed History</h4>
+        <span class="text-muted">Toggleable via the navbar brand.</span>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-2 bg-info">
+                    4
+                </div>
+                <div class="col-md-6 bg-secondary">
+                    5
+                </div>
+                <div class="col-md-4 bg-info">
+                    6
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="collapse" id="StatisticsToggleContent">
+    <div class="bg-dark p-4">
+        <h4 class="text-white">Collapsed Statistics</h4>
+        <span class="text-muted">Toggleable via the navbar brand.</span>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-2 bg-info">
+                    4
+                </div>
+                <div class="col-md-2 bg-secondary">
+                    5
+                </div>
+                <div class="col-md-2 bg-info">
+                    6
+                </div>
+                <div class="col-md-2 bg-info">
+                    7
+                </div>
+                <div class="col-md-2 bg-secondary">
+                    8
+                </div>
+                <div class="col-md-2 bg-info">
+                    9
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6 bg-info">
+                    4
+                </div>
+                <div class="col-md-6 bg-secondary">
+                    4
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<body id="body" class="bg-light animated fadeIn">
+<nav id="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">Control Panel</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item dropdown">
+                <button class="btn btn-sm btn-outline-light" type="button" data-toggle="dropdown">Testing</button>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+
+                    <a class="dropdown-item">Test list</a>
+                    <a class="dropdown-item" href="#">Results</a>
+                    <a class="dropdown-item" href="#">Settings</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <button class="btn btn-sm btn-outline-light" type="button" data-toggle="dropdown">Adiministration</button>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+
+                    <a class="dropdown-item" href="http://127.0.0.1:8000/admin">Admin panel</a>
+                    <a class="dropdown-item" href="http://127.0.0.1:8000/cms/admin/">CMS</a>
+                    <a class="dropdown-item" href="http://127.0.0.1:8000/swagger/">Swagger</a>
+                    <a class="dropdown-item" href="http://127.0.0.1:8000/redoc/">Redoc</a>
+                </div>
+            </li>
+
+        </ul>
+        <!-- <form class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Search</button>
+        </form>&nbsp; -->
+        <button class="btn btn-sm btn-outline-light my-2 my-sm-0" type="button" data-toggle="collapse"
+                data-target="#HistoryToggleContent" aria-controls="HistoryToggleContent" aria-expanded="false"
+                aria-label="Toggle navigation">History
+        </button>&nbsp;
+        <button class="btn btn-sm btn-outline-light my-2 my-sm-0" type="button" data-toggle="collapse"
+                data-target="#StatisticsToggleContent" aria-controls="StatisticsToggleContent" aria-expanded="false"
+                aria-label="Toggle navigation">Statistics
+        </button>
+        <button v-model="username" class="btn btn-sm btn-outline-light my-2 my-sm-0" type="button" data-toggle="collapse"
+                data-target="#CollapseChatContent" aria-controls="CollapseChatContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                    <a v-if="username">[[username]]</a>
+                    <a v-if="username && online">online</a>
+                    <a v-if="!(online)">offline</a>
+        </button>
+
+    </div>
+</nav>
+
+<!-- Vue.js -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script>
+<!-- Axios.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.js"></script>
+<!-- Jquery -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<!-- Bootstrap.js -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<!-- Bootstrap tooltips -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
+
+<script>
+    var navbarVue = new Vue({
+        el: '#navbar',
+        delimiters: ['[[', ']]'],
+        data: {
+            user_id: null,
+            username: null,
+            user_email: null,
+            online: null,
+        },
+        methods: {
+            parse_account_data: async function(account_data) {
+                this.user_id = account_data['user_id'];
+                this.username = account_data['username'];
+                this.user_email = account_data['email'];
+                this.online = account_data['online'];
+            }
+        }
+    })
+</script>
+
+<script>
+    var coreVue = new Vue({
+        el: '#body',
+        data: {
+            socket: null,
+            user: '{{request.user}}',
+            user_id: '{{request.user.id}}',
+            user_is_authenticated: '{{user_is_authenticated}}',
+        },
+        methods: {
+            check_socket_connection: async function() {
+                if (!(this.socket)) {
+                    await this.connect();
+                }
+            },
+            connect: async function() {
+                if (this.user_is_authenticated == 'False') {
+                    console.log('user_is_not_authenticated');
+                    navbarVue.username = 'You';
+
+                } else {
+                    console.log('try connect to socket.');
+                    try {
+                        this.socket = new WebSocket('ws://' + '0.0.0.0:8005' + '/user/0'.replace('0', this.user_id));
+                        this.socket.onmessage = function(e) {
+                            console.log('connected.');
+                            var message = JSON.parse(e.data);
+                            coreVue.update_data(message);
+                        };
+                        this.socket.onclose = function(e) {
+                            coreVue.disconnect_signal('try_again');
+                            console.error('Socket connection closed unexpectedly');
+                        };
+                    } catch {
+                        console.log('hm.. something wrong. try reconnect.');
+                        coreVue.disconnect_signal('try_again');
+                    }
+
+                }
+            },
+            update_data: async function(data) {
+                if ('account' in data) {
+                    await navbarVue.parse_account_data(data['account']);
+                }
+            },
+            disconnect_signal: async function(param) {
+                navbarVue.online = false;
+                if (param == 'try_again') {
+                    await this.timer(5000);
+                    await this.connect();
+                }
+            },
+            timer: async function(ms) {
+                return new Promise(res => setTimeout(res, ms));
+            },
+        }
+    })
+    coreVue.check_socket_connection();
+</script>
+
+
+<script>
+
+</script>
+</body>
+</html>

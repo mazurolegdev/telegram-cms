@@ -1,0 +1,36 @@
+FROM python:3.7.5
+
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+ENV DJANGO_ENV dev
+
+RUN apt-get update
+RUN apt-get -y install gcc g++ cmake python-dev python3-dev nano
+
+COPY ./requirements.txt /app/requirements.txt
+COPY ./entrypoint.py /app/entrypoint.py
+COPY ./db.sqlite3 /app/db.sqlite3
+
+RUN python3 /app/entrypoint.py
+
+RUN pip3 install --upgrade pip
+RUN pip3 install -r /app/requirements.txt
+
+COPY . /app/
+WORKDIR /app/
+
+RUN python3 manage.py makemigrations
+RUN python3 manage.py migrate
+RUN python3 manage.py collectstatic --no-input --clear
+
+RUN useradd admin
+
+RUN chmod -R +rwx /app
+RUN chmod -R +rwx /usr/local/lib/python3.7/
+# RUN chown -R +rwx admin:admin /app/
+# RUN chmod 664 /app/
+
+# RUN python3 /app/libs/leoorm/setup.py install
+
+USER admin
+

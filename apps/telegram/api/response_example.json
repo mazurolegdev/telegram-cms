@@ -1,0 +1,59 @@
+{
+    "_": "pyrogram.Message",
+    "message_id": 16082,
+    "date": "2019-11-13 23:19:34",
+    "chat": {
+        "_": "pyrogram.Chat",
+        "id": -1001331864852,
+        "type": "supergroup",
+        "is_verified": false,
+        "is_restricted": false,
+        "is_scam": false,
+        "title": "Upwork 2.0",
+        "username": "upworkCIS",
+        "photo": {
+            "_": "pyrogram.ChatPhoto",
+            "small_file_id": "AQADAgATU-23DwAEAgAD7Er42xb___-mNmYtTPuzuZyJAAIWBA",
+            "big_file_id": "AQADAgATU-23DwAEAwAD7Er42xb___-mNmYtTPuzuZ6JAAIWBA"
+        },
+        "permissions": {
+            "_": "pyrogram.ChatPermissions",
+            "can_send_messages": true,
+            "can_send_media_messages": true,
+            "can_send_other_messages": true,
+            "can_add_web_page_previews": true,
+            "can_send_polls": true,
+            "can_change_info": false,
+            "can_invite_users": true,
+            "can_pin_messages": false
+        }
+    },
+    "from_user": {
+        "_": "pyrogram.User",
+        "id": 376727470,
+        "is_self": false,
+        "is_contact": false,
+        "is_mutual_contact": false,
+        "is_deleted": false,
+        "is_bot": false,
+        "is_verified": false,
+        "is_restricted": false,
+        "is_scam": false,
+        "is_support": false,
+        "first_name": "Vladimir",
+        "last_name": "Vasilchuk",
+        "status": "recently",
+        "username": "Vladfromua",
+        "dc_id": 2,
+        "photo": {
+            "_": "pyrogram.ChatPhoto",
+            "small_file_id": "AQADAgADs6cxG65ndBYACKn08Q4ABAIAA65ndBYABGKmfaYuPjJ9XFACAAEWBA",
+            "big_file_id": "AQADAgADs6cxG65ndBYACKn08Q4ABAMAA65ndBYABGKmfaYuPjJ9XlACAAEWBA"
+        }
+    },
+    "mentioned": false,
+    "scheduled": false,
+    "from_scheduled": false,
+    "text": "где-то с пару месяцев уже тестят такие поиски",
+    "outgoing": false
+}

@@ -1,0 +1,19 @@
+{% extends 'admin/change_list.html' %}
+{% load staticfiles %}
+{% load i18n %}
+{% block object-tools %}
+{{ block.super }}
+
+
+
+    <center>
+        <div>
+            <span class="btn">
+<!--            <button class="btn btn-sm btn-info" onclick="window.location.href='#'"><h4>Включить всех готовых ботов</h4></button><br>-->
+            <button class="btn btn-sm btn-info" onclick="window.location.href='{% url 'telegram-urls:start-all-bots-url' %}'"><h4>Включить всех готовых ботов</h4></button><br>
+            </span>
+        </div>
+    </center><br>
+
+
+{% endblock %}

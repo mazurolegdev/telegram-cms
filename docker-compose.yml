@@ -1,0 +1,117 @@
+version: '3'
+
+services:
+  django:
+    container_name: django.core
+    build:
+      context: .
+      dockerfile: DockerFile.dev.Backend
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - INSTANCE_ROLE=website
+    depends_on:
+      - redis
+      - celery
+    volumes:
+      - .:/app
+      - static:/app/static
+      - media:/app/media
+    ports:
+      - 8005:8005
+    networks:
+      backend:
+        ipv4_address: 172.25.0.2
+#    command: gunicorn main.wsgi:application --bind 0.0.0.0:8005 --workers 2
+    command: python3 /app/manage.py runserver 0.0.0.0:8005
+
+  async_server:
+    container_name: async.core
+    build:
+      context: .
+      dockerfile: DockerFile.dev.Backend
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - django
+    links:
+      - django:django
+    volumes:
+      - .:/app
+    ports:
+      - 8080:8080
+    networks:
+      backend:
+        ipv4_address: 172.25.0.3
+    command: python3 /app/async_server.py
+
+  redis:
+    container_name: redis.core
+    image: redis:3.2-alpine
+    command: redis-server --appendonly yes
+    restart: always
+    ports:
+      - 6475:6475
+    volumes:
+      - redis:/data
+    networks:
+      backend:
+        ipv4_address: 172.25.0.4
+
+  celery:
+    container_name: celery.core
+    build:
+      context: .
+      dockerfile: DockerFile.dev.Backend
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    volumes:
+      - .:/app
+    restart: always
+    networks:
+      backend:
+        ipv4_address: 172.25.0.5
+    command: celery -A main worker -B -E -l info
+#    command: celery -A main beat -l info
+
+#  node:
+#    container_name: node.core
+#    build:
+#      context: .
+#      dockerfile: DockerFile.dev.Frontend
+#    command: npm run watch
+
+  memcached:
+    image: memcached:1.4-alpine
+
+  nginx:
+    container_name: nginx.core
+    depends_on:
+      - django
+      - async_server
+    build: ./nginx
+    ports:
+      - 80:80
+    restart: always
+    volumes:
+      - static:/app/static
+      - media:/app/media
+    networks:
+      backend:
+        ipv4_address: 172.25.0.10
+
+networks:
+  backend:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
+
+volumes:
+  redis: {}
+  static: {}
+  media: {}
