@@ -17,13 +17,13 @@
 - added default Trigger middleware [auto answered middlewares with usable triggers system inside django admin panel]
 
 # Default Trigger Middleware Usage:
-- check for your app is fully connected to telegram api.
-- create post.view with django rest framework
-- import middleware decorator:
-- from apps.telegram.middlewares import TriggerMiddleware
-- init it like this:
-- trigger = TriggerMiddleware()
-- add to your post.view this way deckrator:
+check for your app is fully connected to telegram api.
+create post.view with django rest framework.
+import middleware decorator:
+from apps.telegram.middlewares import TriggerMiddleware
+init it like this:
+trigger = TriggerMiddleware()
+add to your post.view this way deckrator:
 
 
 - @api_view(['POST'])
@@ -31,7 +31,9 @@
 - def create_message(request):
 -   ...
 
-- then you should create  Base scene in django admin panel and add some triggers with triggered words and answers
+- then you should create  Base scene in django admin panel and add some triggers with triggered words and answers.
+- now its completly done for catch triggers messages with words and answers you want!
+- now its works only for private messages!
 
 # Expectation in v.0.3. alpha:
 - creating sessions inside django admin panel
