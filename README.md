@@ -1,4 +1,5 @@
-# Telegram-CMS v.0.2. alpha [added default Trigger middleware]
+# Telegram-CMS v.0.2. alpha
+[added default Trigger middleware]
 - Based on Opencluster https://opencluster-hub.github.io/opencluster/
 
 
