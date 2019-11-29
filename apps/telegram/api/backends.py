@@ -22,7 +22,7 @@ def get_config(request, id, token, format=None):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
-@trigger.middleware
+@trigger.message
 def create_message(request):
     if request.method == "POST":
         try:

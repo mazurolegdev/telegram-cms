@@ -14,6 +14,38 @@ loop = asyncio.get_event_loop()
 def change_device_model(app, model):
     app.DEVICE_MODEL = model
 
+def create_session_from_command_line():
+    print('Чтобу получить API доступ к вашему аккаунту и создать сессию,'
+          'Нужно перейти по ссылке https://my.telegram.org/ и авторизоваться.'
+          'Далее создать приложение с любым названием и любой платформой.'
+          'Как правило название это набор рандомных символов. Это нормально.'
+          'Далее вы получите API_ID и API_HASH. Их нужно будет вставить по инструкции ниже,'
+          'чтобы инициализировать сессию вашего телеграм аккаунта.')
+    api_id = input("Введите API_ID:")
+    api_hash = input("Введите API_HASH:")
+    session_name = input("Введите название сессии (только латинница):")
+
+    app = Client(
+        session_name,
+        api_id,
+        api_hash,
+        workdir='apps/telegram/sessions/',
+        device_model='MacBookPro13,1, macOS 10.14.6',
+        app_version='Telegram macOS 5.8 (185085) APPSTORE',
+        system_version='Darwin 18.7.0',
+    )
+    try:
+        app.start()
+        app.stop()
+        print(f"Сессия успешно создана. Теперь она находится в папке apps/telegram/sessions "
+              f"и будет использоваться в дальнейшем для коммуникации с телеграм API."
+              f"API_ID: {api_id}."
+              f"API_HASH: {api_hash}"
+              f"SESSION_NAME: {session_name}")
+    except:
+        print("Не удалось создать сессию. Что-то пошло не так. :(")
+
+
 async def create_session():
     app = Client(
         'netcraft_session',
@@ -79,18 +111,6 @@ async def main(config, session):
 
 if __name__ == '__main__':
     try:
-        loop.run_until_complete(create_session())
+        create_session_from_command_line()
     except KeyboardInterrupt:
-        app.stop()
-
-    except Forbidden:
-        log('Forbidden', 2)
-
-    except PhoneNumberBanned:
-        log('PhoneNumberBanned', 2)
-
-    except UserBannedInChannel:
-        log('UserBannedInChannel', 2)
-
-    except BadRequest:
-        log('BadRequest', 2)
+        pass

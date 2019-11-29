@@ -31,7 +31,7 @@ def get_note(request, id, access_token):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
-@trigger.middleware
+@trigger.message
 def test_middleware(request):
     if request.method == "POST":
         return Response(status=status.HTTP_200_OK)

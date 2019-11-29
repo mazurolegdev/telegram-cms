@@ -17,7 +17,7 @@ loop = asyncio.get_event_loop()
 ssl_context = ssl.create_default_context(cafile=certifi.where())
 
 DJANGO_SERVER_URL = os.environ.get('DJANGO_SERVER_URL')
-base_link = f'{DJANGO_SERVER_URL}/api/telegram/config/29/012d080a0f9211eab83d0242ac190002012d0b980f9211eab83d0242ac190002/'
+base_link = f'{DJANGO_SERVER_URL}/api/telegram/config/1/012d080a0f9211eab83d0242ac190002012d0b980f9211eab83d0242ac190002/'
 link = f'{DJANGO_SERVER_URL}/api/telegram/'
 create_message_link = f'{link}message'
 

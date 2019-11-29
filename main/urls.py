@@ -9,6 +9,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('jet/', include('jet.urls', 'jet')),  # Django JET URLS
+    path('dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS
     path('admin/', admin.site.urls),
 
     path('', include(('apps.core.core_urls', 'core'), namespace='core-urls')),

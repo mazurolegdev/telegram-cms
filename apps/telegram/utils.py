@@ -46,6 +46,13 @@ from django.conf import settings
 #
 #     return reasons
 
+def get_triggers_from_scene(scene):
+    triggers = []
+    for trigger in scene.triggers.all():
+        triggers.append(trigger)
+
+    return triggers
+
 
 def get_model_lazy(model_name: str):
     from apps.telegram import models

@@ -16,54 +16,25 @@ class TriggerMiddleware:
         self.task = TriggerMiddlewareTasks()
 
 
-    def middleware(self, func):
+    def message(self, func):
         def wrapper(request, *args, **kwargs):
-            from apps.telegram.models import Trigger, Config
 
-            try:
-                self.app_id = request.data['app_id']
-                self.text = request.data['text']
-                self.sender_id = request.data['sender_id']
-                self.sender_username = request.data['sender_username']
+            if request.data['chat_type'] == 'private':
+                self.logger(f"Catch non private message", self)
 
-                if request.data['chat_type'] == 'private':
-                    pass
+                try:
+                    self.task.private_pre_task.delay(request.data)
 
-                self.app = Config.objects.get(api_id=self.app_id)
+                    # here you can do what ever you want
 
-                self.triggers = Trigger.objects.filter(app=self.app)
-                self.pre_task()
+                    self.task.private_post_task.delay()
+                    return func(request, *args, **kwargs)
 
-                # here you can do what ever you want
+                except MultiValueDictKeyError:
+                    return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-                self.post_task()
+            else:
+                self.logger(f"Catch non private message", self)
                 return func(request, *args, **kwargs)
 
-            except Config.DoesNotExist:
-                return Response(status=status.HTTP_204_NO_CONTENT)
-
-            except Trigger.DoesNotExist:
-                return Response(status=status.HTTP_204_NO_CONTENT)
-
-            except MultiValueDictKeyError:
-                print(request.data)
-                return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-            # except:
-            #     return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
         return wrapper
-
-    def pre_task(self):
-        for trigger in self.triggers.all():
-            self.task.pre_task.delay(
-                str(self.app.id),
-                str(trigger.id),
-                str(self.sender_id),
-                str(self.sender_username),
-                str(self.text)
-            )
-
-
-    def post_task(self):
-        self.task.post_task.delay()

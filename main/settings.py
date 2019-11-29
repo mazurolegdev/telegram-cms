@@ -29,6 +29,7 @@ LOCAL = False
 
 ALLOWED_HOSTS = ['*']
 ASYNC_SERVER_URL = os.environ.get('ASYNC_SERVER_URL')
+ASYNC_SEND_MESSAGE_URL = f"{ASYNC_SERVER_URL}/message/send"
 
 # Application definition
 COMMON_APPS = [
@@ -45,6 +46,7 @@ ROOT_APPS = [
 ] + COMMON_APPS
 
 INSTALLED_APPS = [
+    'jet.dashboard',
     'jet',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -122,6 +124,39 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Europe/Moscow'
 CELERY_CACHE_BACKEND = 'django-cache'
 ELERY_ACCEPT_CONTENT = ['json']
+
+JET_THEMES = [
+    {
+        'theme': 'default', # theme folder name
+        'color': '#47bac1', # color of the theme's button in user menu
+        'title': 'Default' # theme title
+    },
+    {
+        'theme': 'green',
+        'color': '#44b78b',
+        'title': 'Green'
+    },
+    {
+        'theme': 'light-green',
+        'color': '#2faa60',
+        'title': 'Light Green'
+    },
+    {
+        'theme': 'light-violet',
+        'color': '#a464c4',
+        'title': 'Light Violet'
+    },
+    {
+        'theme': 'light-blue',
+        'color': '#5EADDE',
+        'title': 'Light Blue'
+    },
+    {
+        'theme': 'light-gray',
+        'color': '#222',
+        'title': 'Light Gray'
+    }
+]
 
 
 # Database

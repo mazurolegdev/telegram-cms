@@ -1,11 +1,13 @@
 import re
 import uuid
+import random
 
 import requests
 from apps.telegram.middlewares import TriggerMiddleware
-from apps.telegram.reasons import BaseReason
+from apps.telegram.reasons import DefaultTriggerReason
 from django.conf import settings
 from django.db import models
+from importlib import import_module
 
 
 def models_logger(message):
@@ -473,7 +475,7 @@ class Message(models.Model):
 
 class Middleware(models.Model):
     MIDDLEWARE_CLASS_CHOICES = (
-        ("trigger_middleware", "Trigger Middleware"),
+        ("DefaultTriggerReason", "Default Trigger Reason"),
     )
 
     middleware_type = models.CharField(
@@ -482,7 +484,7 @@ class Middleware(models.Model):
         default=None,
         null=True,
         blank=False,
-        help_text='Не доступно для ручного изменения.'
+        verbose_name='Обработчик'
     )
 
     class Meta:
@@ -493,28 +495,25 @@ class Middleware(models.Model):
         return f"{self.id}: {self.middleware_type}"
 
     def save(self, *args, **kwargs):
-        if self.middleware_type == 'trigger_middleware':
-            self.reason = TriggerMiddleware(self)
         return super(Middleware, self).save(*args, **kwargs)
 
 
 class Trigger(Middleware):
-    app = models.ForeignKey(
-        "telegram.Config",
-        on_delete=models.deletion.SET_NULL,
-        default=None,
-        null=True,
-        blank=True,
-        verbose_name='Приложение'
-    )
-
-    words = models.CharField(
-        max_length=500,
+    words = models.TextField(
         default=None,
         null=True,
         blank=True,
         verbose_name='Триггерные слова',
         help_text='Через запятую'
+    )
+
+    answers = models.TextField(
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name='Ответы',
+        help_text='Через запятую. \n'
+                  'Ответ выбирается случайным образом из указанного списка.'
     )
 
     is_enabled = models.BooleanField(
@@ -524,24 +523,47 @@ class Trigger(Middleware):
         verbose_name='Активно'
     )
 
-    reason = models.ForeignKey(
-        "telegram.TriggerReason",
-        on_delete=models.deletion.SET_NULL,
-        default=None,
-        null=True,
+    timestamp = models.DateTimeField(
+        auto_now=True,
         blank=True,
-        verbose_name='Обработчик триггеров'
+        null=True,
     )
 
-    def gen_dict_from_words(self):
-        return self.words.split(',')
+    def gen_list_from_answers(self):
+        answers = []
+        i = str(self.answers).split(',')
+        for answer in i:
+            if answer[0] == ' ':
+                answers.append(answer[1:])
+        return answers
+
+    def get_random_answer(self):
+        answers = self.gen_list_from_answers()
+        return random.choice(answers)
+
+    def gen_list_from_words(self):
+        words = []
+        l = str(self.words).split(',')
+        for word in l:
+            if word[0] == ' ':
+                words.append(word[1:])
+        return words
+
+    def get_reasons_module(self):
+        return import_module('apps.telegram.reasons')
+
+    def get_reason(self):
+        reason_module = self.get_reasons_module()
+        reason = getattr(reason_module, str(self.middleware_type))
+        return reason
 
     def __str__(self):
-        return f"{self.gen_dict_from_words()}"
+        return str(self.words)
 
     def save(self, *args, **kwargs):
-        self.words = re.sub(' ', '', self.words)
-        self.middleware_type = 'trigger_middleware'
+        print(self.middleware_type)
+        if self.middleware_type == 'DefaultTriggerReason':
+            pass
         return super(Trigger, self).save(*args, **kwargs)
 
     class Meta:
@@ -549,16 +571,159 @@ class Trigger(Middleware):
         verbose_name_plural = 'триггеры'
 
 
-class TriggerReason(BaseReason):
-    TRIGGER = True
+class BaseScene(models.Model):
+    title = models.CharField(
+        max_length=255,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name='Сценарий'
+    )
+
+    app = models.ForeignKey(
+        "telegram.Config",
+        on_delete=models.deletion.SET_NULL,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name='Приложение'
+    )
+
+    triggers = models.ManyToManyField(
+        "telegram.Trigger",
+        default=None,
+        blank=True,
+        verbose_name='Триггеры',
+    )
+
+    is_enabled = models.BooleanField(
+        default=False,
+        null=True,
+        blank=True,
+        verbose_name='Активный'
+    )
+
+    timestamp = models.DateTimeField(
+        auto_now=True,
+        blank=True,
+        null=True,
+    )
 
     def __str__(self):
-        return f"ID: {self.id}"
+        return f"id: {self.id}, {self.title}"
 
     class Meta:
-        verbose_name = 'обработчик'
-        verbose_name_plural = 'обработчики'
+        verbose_name = 'родительская сцена'
+        verbose_name_plural = 'родительские сцены'
 
 
-class BrokenMessages(models.Model):
-    pass
+class SceneInstance(BaseScene):
+    is_current_instance = models.BooleanField(
+        default=False,
+        null=True,
+        blank=True,
+        help_text='Не доступно для ручного изменения.',
+        editable=False,
+    )
+
+    is_finished_instance = models.BooleanField(
+        default=False,
+        null=True,
+        blank=True,
+        help_text='Не доступно для ручного изменения.',
+        editable=False,
+    )
+
+    is_message = models.BooleanField(
+        default=None,
+        null=True,
+        blank=True,
+        editable=False,
+    )
+
+    message_type = models.CharField(
+        max_length=255,
+        choices=Message.MESSAGE_TYPE_CHOICES,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name='Тип сообщения'
+    )
+    message_id = models.PositiveIntegerField(
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name='ID сообщения'
+    )
+
+    text = models.TextField(
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name='Текст сообщения'
+    )
+
+    sender_id = models.PositiveIntegerField(
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name='ID отправителя'
+    )
+
+    sender_username = models.CharField(
+        db_index=True,
+        max_length=255,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name='Телеграм юзер'
+    )
+    sender_first_name = models.CharField(
+        max_length=255,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name='Имя'
+    )
+    sender_last_name = models.CharField(
+        max_length=255,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name='Фамилия'
+    )
+
+    def __str__(self):
+        return f"id: {self.id}, {self.title}, sender_username: {self.sender_username}"
+
+    class Meta:
+        verbose_name = 'сцена сообщения'
+        verbose_name_plural = 'сцены сообщений'
+
+class History(models.Model):
+
+    subject = models.TextField(
+        default=None,
+        blank=True,
+        null=True,
+        verbose_name='Предмет истории'
+    )
+
+    is_error = models.BooleanField(
+        default=False,
+        null=True,
+        blank=True
+    )
+
+    timestamp = models.DateTimeField(
+        auto_now=True,
+        blank=True,
+        null=True,
+    )
+
+    def __str__(self):
+        return f"id: {self.id}, is_error: {self.is_error}, {self.timestamp}"
+
+    class Meta:
+        verbose_name = 'история'
+        verbose_name_plural = 'истории'

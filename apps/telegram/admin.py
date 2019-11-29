@@ -1,5 +1,5 @@
 from django.contrib import admin
-from apps.telegram.models import Config, Message, Chat, TelegramUser, Trigger, TriggerReason
+from apps.telegram.models import Config, Message, Chat, TelegramUser, Trigger, BaseScene, SceneInstance
 from django.http import HttpResponseRedirect
 
 admin.site.site_header = 'Telegram CMS v0.1'               # default: "Django Administration"
@@ -13,14 +13,19 @@ class ConfigAdmin(admin.ModelAdmin):
 
     # change_list_template = "root/admin/change_list.html"
 
-@admin.register(TriggerReason)
-class TriggerReasonAdmin(admin.ModelAdmin):
+@admin.register(BaseScene)
+class SceneAdmin(admin.ModelAdmin):
+    list_display = ('id', 'title', 'app', 'is_enabled', 'timestamp')
+
+
+@admin.register(SceneInstance)
+class MessageSceneAdmin(admin.ModelAdmin):
     pass
+
 
 @admin.register(Trigger)
 class TriggerAdmin(admin.ModelAdmin):
-    list_display = ('id', 'app', 'middleware_type', 'is_enabled', 'reason')
-    readonly_fields = ('middleware_type',)
+    list_display = ('id', 'middleware_type', 'is_enabled',)
 
 @admin.register(TelegramUser)
 class TelegramUserAdmin(admin.ModelAdmin):
