@@ -6,6 +6,7 @@
 - Install Docker and docker-compose
 - git clone https://github.com/codefather-labs/telegram-cms.git
 - touch .env
+- start docker daemon if it not started
 - docker-compose build
 - docker-compose up
 
