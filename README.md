@@ -9,6 +9,12 @@
 - start docker daemon if it not started
 - docker-compose build
 - docker-compose up
+- http://0.0.0.0:80/admin
+- login: admin
+- password: admin
+
+# This build is for local demonstration or for UNSAFE local usind only!
+For production using, you need change database!
 
 # Before start use Telegram CMS, > Entry with telegram API:
 - sh ./create_session.sh
