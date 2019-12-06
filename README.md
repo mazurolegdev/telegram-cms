@@ -31,7 +31,7 @@ Instruments:
 - Redis
 - Memcached
 - Nginx
-# Containers connected with network inside docker
+# Containers connected with bridge inside docker
 
 # Setup:
 - Install Docker and docker-compose
