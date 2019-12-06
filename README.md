@@ -14,6 +14,8 @@ Instruments:
 - Redoc
 
 # Short architecture description:
+- State machine inside Django's MVC and Aiohttp. Both got API.
+
 - Pyrogram inside aiohttp with accounts connectors and easy api.
 - Pyrogram listen all account updates and send it to Django.
 - Custom Django middlewares catch request data from aiohttp, and send it to handle tasks.
