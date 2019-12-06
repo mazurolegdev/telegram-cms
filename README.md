@@ -7,6 +7,7 @@ Instruments:
 - Docker
 - Django framework
 - Django Rest Framework
+- Django Channels
 - Aiohttp + Aiojobs
 - Pyrogram
 - Celery
