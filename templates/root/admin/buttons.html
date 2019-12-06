@@ -1,17 +1,153 @@
 {% extends "admin/change_form.html" %}
+{% load static %}
 {% load i18n %}
 {% block submit_buttons_bottom %}
 
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+<!-- Vue.js -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script>
 
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
-<button class="btn btn-block btn-outline-secondary" type="submit" name="_send_message">
-    Отправить сообщение {{model}} <i class="fa fa-telegram" aria-hidden="true"></i>
-</button>
-
+<div class="pos-f-t">
+    <div class="collapse" id="navbarTelegramSession">
+        <div class="bg-light p-4">
+            <h5 class="text-dark h4">Telegram Options</h5>
+            <div class="row">
+                <div class="col-3">
+                    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                        <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home"
+                           role="tab" aria-controls="v-pills-home" aria-selected="true">Getting started</a>
+                        <a class="nav-link" id="v-pills-session-tab" data-toggle="pill" href="#v-pills-session"
+                           role="tab" aria-controls="v-pills-session" aria-selected="false">Session</a>
+                        <a class="nav-link" id="v-pills-logging-tab" data-toggle="pill" href="#v-pills-logging"
+                           role="tab" aria-controls="v-pills-logging" aria-selected="false">Logging</a>
+                    </div>
+                </div>
+                <div class="col-9">
+                    <div class="tab-content" id="v-pills-tabContent">
+                        <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel"
+                             aria-labelledby="v-pills-home-tab">
+                            <div class="row">
+                                First of all, you need sync your config data with telegram session.
+                                If you newbie with it, click on Session button at left and click Create button.
+                                Then you need to continue a Telegram authenticate.
+                                If you got complete message, you got access to your Telegram account from Telegram CMS.
+                                If you don't, follow your error.
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="v-pills-session" role="tabpanel"
+                             aria-labelledby="v-pills-session-tab">
+                            <div class="row">
+                                <div>
+                                    <!--                                    {% for field in opts.fields %}-->
+                                    <!--                                    {{ field }}-->
+                                    <!--                                    {% endfor %}-->
+                                    <!--                                    {{ opts.model }}-->
+                                    {% if opts.model.is_ready %}
+                                    <button type="submit" name="_create_session" class="btn btn-sm btn-outline-primary">
+                                        Create
+                                    </button>
+                                    {% else %}
+                                    <button type="submit" name="_create_session" class="btn btn-sm btn-outline-primary">
+                                        Check connection
+                                    </button>
+                                    {% endif %}
+                                    <button type="button" class="btn btn-sm btn-outline-danger">Delete</button>
+                                    <br>
+                                    <small>If current session already created, Create button will be check connection.
+                                        Else it will be create new session.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="v-pills-logging" role="tabpanel"
+                             aria-labelledby="v-pills-logging-tab">
+                            <div class="row col-12">
+                                logging
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <nav class="navbar navbar-light bg-light">
+        <button class="btn btn-block btn-outline-primary" type="button" name="_create_session" data-toggle="collapse"
+                data-target="#navbarTelegramSession">
+            Options <i class="fa fa-telegram" aria-hidden="true"></i>
+        </button>
+        <button class="btn btn-block btn-outline-secondary" type="button" name="#">
+            Generate new access token <i class="fa fa-key" aria-hidden="true"></i>
+        </button>
+    </nav>
+</div>
 <br>
+<!--<script>-->
+<!--    telegramVue = new Vue({-->
+<!--        el: '#body'-->
+<!--    })-->
+<!--</script>-->
+
+<!--<script>-->
+<!--    var adminVue = new Vue({-->
+<!--        el: '#body',-->
+<!--        data: {-->
+<!--            socket: null,-->
+<!--            user: '{{request.user}}',-->
+<!--            user_id: '{{request.user.id}}',-->
+<!--            user_is_authenticated: '{{user_is_authenticated}}',-->
+<!--        },-->
+<!--        methods: {-->
+<!--            check_socket_connection: async function() {-->
+<!--                if (!(this.socket)) {-->
+<!--                    await this.connect();-->
+<!--                }-->
+<!--            },-->
+<!--            connect: async function() {-->
+<!--                if (this.user_is_authenticated == 'False') {-->
+<!--                    console.log('user_is_not_authenticated');-->
+<!--                    telegramVue.username = 'You';-->
+
+<!--                } else {-->
+<!--                    console.log('try connect to socket.');-->
+<!--                    try {-->
+<!--                        this.socket = new WebSocket('ws://' + '0.0.0.0:8005' + '/user/0'.replace('0', this.user_id));-->
+<!--                        this.socket.onmessage = function(e) {-->
+<!--                            console.log('connected.');-->
+<!--                            var message = JSON.parse(e.data);-->
+<!--                            adminVue.update_data(message);-->
+<!--                        };-->
+<!--                        this.socket.onclose = function(e) {-->
+<!--                            adminVue.disconnect_signal('try_again');-->
+<!--                            console.error('Socket connection closed unexpectedly');-->
+<!--                        };-->
+<!--                    } catch {-->
+<!--                        console.log('hm.. something wrong. try reconnect.');-->
+<!--                        adminVue.disconnect_signal('try_again');-->
+<!--                    }-->
+
+<!--                }-->
+<!--            },-->
+<!--            update_data: async function(data) {-->
+<!--                if ('account' in data) {-->
+<!--&lt;!&ndash;                    await telegramVue.parse_account_data(data['account']);&ndash;&gt;-->
+<!--                }-->
+<!--            },-->
+<!--            disconnect_signal: async function(param) {-->
+<!--                telegramVue.online = false;-->
+<!--                if (param == 'try_again') {-->
+<!--                    await this.timer(5000);-->
+<!--                    await this.connect();-->
+<!--                }-->
+<!--            },-->
+<!--            timer: async function(ms) {-->
+<!--                return new Promise(res => setTimeout(res, ms));-->
+<!--            },-->
+<!--        }-->
+<!--    })-->
+<!--    adminVue.check_socket_connection();-->
+<!--</script>-->
 {{ block.super }}
 <!-- <div class=”submit-row list-group”>
 <button type=”button” title=”Cancel” class=”list-group-item active” name=”_cancel” onclick=”location.href=’/admin/order/project/’;”>
@@ -24,9 +160,9 @@
 {% block form_top %}
 
 
-    <!-- <button class="btn btn-primary">Сгенерировать публичный ключ</button>
-    <button class="btn btn-primary">Сгенерировать приватный ключ</button>
-    <br><br> -->
+<!--<button class="btn btn-primary">Сгенерировать новый токен досутпа</button>-->
+<!--<button class="btn btn-primary">Сгенерировать приватный ключ</button>-->
+<!--<br><br>-->
 {% endblock %}
 
 

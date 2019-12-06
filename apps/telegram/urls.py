@@ -5,6 +5,8 @@ from apps.telegram import views as telegram_views
 
 
 api_patterns = [
+    path('config/all/', api_views.get_all_configs),
+    path('config', api_views.update_application),
     path('config/<int:id>/<str:token>/', api_views.get_config),
     path('message', api_views.create_message),
     path('start_all_bots', telegram_views.start_all_bots, name='start-all-bots-url'),

@@ -54,5 +54,5 @@ class Note(models.Model):
         return self
 
     class Meta:
-        verbose_name = 'записка'
-        verbose_name_plural = 'записки'
+        verbose_name = 'note'
+        verbose_name_plural = 'notes'

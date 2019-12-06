@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
-# from main.utils import env
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -23,13 +22,15 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'pd9g8r&z=&o4o1h#_*=bi826_=fu#@zq8le1553cpjq6cs&sw6'
 
+# from main.utils import get_config
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-LOCAL = False
 
 ALLOWED_HOSTS = ['*']
-ASYNC_SERVER_URL = os.environ.get('ASYNC_SERVER_URL')
-ASYNC_SEND_MESSAGE_URL = f"{ASYNC_SERVER_URL}/message/send"
+# ASYNC_SERVER_URL = get_config()['ASYNC_SERVER_URL']
+# DJANGO_SERVER_URL = get_config()['DJANGO_SERVER_URL']
+# ASYNC_SEND_MESSAGE_URL = f"{ASYNC_SERVER_URL}/message/send"
 
 # Application definition
 COMMON_APPS = [
@@ -192,7 +193,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
-LANGUAGE_CODE = 'ru-RU'
+LANGUAGE_CODE = 'en-EN'
 
 TIME_ZONE = 'UTC'
 

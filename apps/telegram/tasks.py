@@ -1,28 +1,40 @@
 import requests
-from apps.telegram.models import Config, BaseScene
-from apps.telegram.utils import telegram_logger, get_triggers_from_scene
 from django.conf import settings
 from django.utils.datastructures import MultiValueDictKeyError
+
+from apps.telegram.models import Config, Scene
+from apps.telegram.utils import telegram_logger
 from main.celery import app
 
 
 class TriggerMiddlewareTasks:
 
     @staticmethod
+    def get_app(data):
+        if data['is_bot_session'] == 'True':
+            return Config.objects.get(api_id=data['app_id'], is_bot=True)
+
+        elif data['is_bot_session'] == 'False':
+            return Config.objects.get(api_id=data['app_id'], is_bot=False)
+
+    @staticmethod
     @app.task()
     def private_pre_task(data):
+        app = TriggerMiddlewareTasks.get_app(data)
+        scenes = Scene.objects.filter(app=app, is_enabled=True)
 
-        app = Config.objects.get(api_id=data['app_id'])
-        scenes = BaseScene.objects.filter(app=app, is_enabled=True)
-        print(f"scenes: {scenes}")
-        triggers = [get_triggers_from_scene(scene) for scene in scenes]
-        print(f"triggers: {triggers}")
+        triggers = []
+        for scene in scenes:
+            triggers.append(scene.triggers.all())
 
-        for trigger in triggers:
-            if trigger[0].is_enabled and trigger[0].middleware_type:
+        # FIXME
+        current_trigger_instance = None
+
+        for trigger in triggers[0]:
+            if trigger.is_enabled and trigger.middleware_type:
                 try:
-                    trigger[0].get_reason().start(
-                        trigger[0], data
+                    trigger.get_reason().start(
+                        trigger, data, app, current_trigger_instance
                     )
 
                 except MultiValueDictKeyError:
@@ -31,7 +43,7 @@ class TriggerMiddlewareTasks:
     @staticmethod
     @app.task()
     def private_post_task():
-        print('Init post task')
+        pass
 
 
 @app.task()

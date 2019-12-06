@@ -11,8 +11,9 @@ from importlib import import_module
 
 
 def models_logger(message):
-    if settings.DEBUG:
-        print(f"[models-logger]: {message}")
+    pass
+    # if settings.DEBUG:
+    #     print(f"[models-logger]: {message}")
 
 
 class Config(models.Model):
@@ -21,7 +22,15 @@ class Config(models.Model):
         default=None,
         null=True,
         blank=False,
-        verbose_name='Название сессии'
+        verbose_name='Session name'
+    )
+    session_string = models.CharField(
+        max_length=1000,
+        default=None,
+        null=True,
+        blank=True,
+        # editable=False,
+        help_text='Updated automatically'
     )
 
     api_id = models.PositiveIntegerField(
@@ -44,7 +53,8 @@ class Config(models.Model):
         default=None,
         null=True,
         blank=True,
-        verbose_name='Токен доступа к API'
+        verbose_name='CMS API Access Token',
+        help_text='Updated and created automatically'
     )
 
     bot_token = models.CharField(
@@ -52,29 +62,29 @@ class Config(models.Model):
         default=None,
         null=True,
         blank=True,
-        verbose_name='Токен бота (если это бот)'
+        verbose_name='Telegram Bot Token (if bot)'
     )
 
     is_bot = models.BooleanField(
         default=None,
         null=True,
         blank=True,
-        verbose_name='Это бот'
+        verbose_name="It's bot"
     )
 
     is_active = models.BooleanField(
         default=None,
         null=True,
         blank=True,
-        verbose_name='Активен (включен)',
-        help_text='Изменять вручную не нужно.'
+        verbose_name='Is active (on)',
+        help_text='Updated automatically.'
     )
 
     is_ready = models.BooleanField(
         default=None,
         null=True,
         blank=True,
-        verbose_name='Готов к использованию',
+        verbose_name='Is ready to use (set it on when app ready to use)',
     )
 
     def __str__(self):
@@ -103,7 +113,7 @@ class TelegramUser(models.Model):
         default=None,
         null=True,
         blank=True,
-        verbose_name='ID отправителя'
+        verbose_name='Sender id'
     )
 
     tg_username = models.CharField(
@@ -112,58 +122,58 @@ class TelegramUser(models.Model):
         default=None,
         null=True,
         blank=True,
-        verbose_name='Телеграм юзер'
+        verbose_name='Sender username'
     )
     tg_first_name = models.CharField(
         max_length=255,
         default=None,
         null=True,
         blank=True,
-        verbose_name='Имя'
+        verbose_name='Sender first name'
     )
     tg_last_name = models.CharField(
         max_length=255,
         default=None,
         null=True,
         blank=True,
-        verbose_name='Фамилия'
+        verbose_name='Sender last name'
     )
     tg_recently_status = models.CharField(
         max_length=255,
         default=None,
         null=True,
         blank=True,
-        verbose_name='Последнее посещение'
+        verbose_name='Recently status'
     )
 
     is_bot = models.BooleanField(
         default=None,
         null=True,
         blank=True,
-        verbose_name='Это бот'
+        verbose_name="It's bot"
     )
     is_contact = models.BooleanField(
         default=None,
         null=True,
         blank=True,
-        verbose_name='Юзер из контактов'
+        verbose_name='User from contacts'
     )
     is_scam = models.BooleanField(
         default=None,
         null=True,
         blank=True,
-        verbose_name='Скомпроментирован'
+        verbose_name='Is scam'
     )
     is_support = models.BooleanField(
         default=None,
         null=True,
         blank=True,
-        verbose_name='Это тех. поддержка'
+        verbose_name='Is support'
     )
 
     class Meta:
-        verbose_name = 'телеграм юзер'
-        verbose_name_plural = 'телеграм юзеры'
+        verbose_name = 'telegram user'
+        verbose_name_plural = 'telegram users'
 
     def __str__(self):
         return f"{self.tg_first_name} {self.tg_last_name}"
@@ -205,33 +215,33 @@ class Chat(models.Model):
         default=None,
         null=True,
         blank=True,
-        verbose_name='ID чата'
+        verbose_name='Chat id'
     )
     tg_chat_type = models.CharField(
         max_length=255,
         default=None,
         null=True,
         blank=True,
-        verbose_name='Тип чата, напр. супергруппа'
+        verbose_name='Chat type'
     )
     tg_chat_title = models.CharField(
         max_length=255,
         default=None,
         null=True,
         blank=True,
-        verbose_name='Title чата'
+        verbose_name='Chat title'
     )
     tg_chat_username = models.CharField(
         max_length=255,
         default=None,
         null=True,
         blank=True,
-        verbose_name='Username чата'
+        verbose_name='Chat username'
     )
 
     class Meta:
-        verbose_name = 'чат'
-        verbose_name_plural = 'чаты'
+        verbose_name = 'chat'
+        verbose_name_plural = 'Chats'
 
     def __str__(self):
         return f"{self.tg_chat_title}"
@@ -258,8 +268,8 @@ class Chat(models.Model):
 
 class Message(models.Model):
     MESSAGE_TYPE_CHOICES = (
-        ("Incoming", "Входящее"),
-        ("Sent", "Исходящее")
+        ("Incoming", "Incoming"),
+        ("Sent", "Sent")
     )
 
     # TODO Добавить поле app_id/добавить в сериализатор, обновить на вьюхе.
@@ -271,7 +281,7 @@ class Message(models.Model):
         default=None,
         null=True,
         blank=True,
-        verbose_name='Приложение'
+        verbose_name='Application'
     )
 
     message_type = models.CharField(
@@ -280,27 +290,27 @@ class Message(models.Model):
         default=None,
         null=True,
         blank=True,
-        verbose_name='Тип сообщения'
+        verbose_name='Message type'
     )
     message_id = models.PositiveIntegerField(
         default=None,
         null=True,
         blank=True,
-        verbose_name='ID сообщения'
+        verbose_name='Message id'
     )
 
     text = models.TextField(
         default=None,
         null=True,
         blank=True,
-        verbose_name='Текст сообщения'
+        verbose_name='Message text'
     )
 
     sender_id = models.PositiveIntegerField(
         default=None,
         null=True,
         blank=True,
-        verbose_name='ID отправителя'
+        verbose_name='Sender id'
     )
 
     sender_username = models.CharField(
@@ -309,81 +319,81 @@ class Message(models.Model):
         default=None,
         null=True,
         blank=True,
-        verbose_name='Телеграм юзер'
+        verbose_name='Sender username'
     )
     sender_first_name = models.CharField(
         max_length=255,
         default=None,
         null=True,
         blank=True,
-        verbose_name='Имя'
+        verbose_name='Sender first name'
     )
     sender_last_name = models.CharField(
         max_length=255,
         default=None,
         null=True,
         blank=True,
-        verbose_name='Фамилия'
+        verbose_name='Sender last name'
     )
     sender_recently_status = models.CharField(
         max_length=255,
         default=None,
         null=True,
         blank=True,
-        verbose_name='Последнее посещение'
+        verbose_name='Recently status'
     )
 
     sender_is_bot = models.BooleanField(
         default=None,
         null=True,
         blank=True,
-        verbose_name='Это бот'
+        verbose_name="It's bot"
     )
     sender_is_contact = models.BooleanField(
         default=None,
         null=True,
         blank=True,
-        verbose_name='Юзер из контактов'
+        verbose_name='Sender in contacts'
     )
     sender_is_scam = models.BooleanField(
         default=None,
         null=True,
         blank=True,
-        verbose_name='Скомпроментирован'
+        verbose_name='Sender is scam'
     )
     sender_is_support = models.BooleanField(
         default=None,
         null=True,
         blank=True,
-        verbose_name='Это тех. поддержка'
+        verbose_name="It's support"
     )
 
     chat_id = models.IntegerField(
         default=None,
         null=True,
         blank=True,
-        verbose_name='ID чата'
+        verbose_name='Chat id'
     )
     chat_type = models.CharField(
         max_length=255,
         default=None,
         null=True,
         blank=True,
-        verbose_name='Тип чата, напр. супергруппа'
+        verbose_name='Chat type'
     )
     chat_title = models.CharField(
         max_length=255,
         default=None,
         null=True,
         blank=True,
-        verbose_name='Title чата'
+        verbose_name='Chat title'
     )
     chat_username = models.CharField(
         max_length=255,
         default=None,
         null=True,
         blank=True,
-        verbose_name='Username чата'
+        verbose_name='Chat username'
     )
 
     timestamp = models.DateTimeField(
@@ -393,8 +403,8 @@ class Message(models.Model):
     )
 
     class Meta:
-        verbose_name = 'сообщение'
-        verbose_name_plural = 'сообщения'
+        verbose_name = 'message'
+        verbose_name_plural = 'Messages'
 
     def __str__(self):
         return f"ID: {self.message_id}, from: {self.sender_first_name} {self.sender_last_name}"
@@ -484,7 +494,7 @@ class Middleware(models.Model):
         default=None,
         null=True,
         blank=False,
-        verbose_name='Обработчик'
+        verbose_name='Handler'
     )
 
     class Meta:
@@ -499,28 +509,118 @@ class Middleware(models.Model):
 
 
 class Trigger(Middleware):
+
+    title = models.CharField(
+        max_length=255,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name='Title'
+    )
+
     words = models.TextField(
         default=None,
         null=True,
         blank=True,
-        verbose_name='Триггерные слова',
-        help_text='Через запятую'
+        verbose_name='Trigger words',
+        help_text='Separated by a comma without spaces in between. '
+                  'If left blank, the trigger will become "Executable Immediately".'
+                  'He will not wait for the trigger word on entry, but will be executed immediately upon his call.'
+                  'Convenient for dynamic dialogue continuation.'
     )
 
     answers = models.TextField(
         default=None,
         null=True,
         blank=True,
-        verbose_name='Ответы',
-        help_text='Через запятую. \n'
-                  'Ответ выбирается случайным образом из указанного списка.'
+        verbose_name='answers',
+        help_text='Separated by a comma. \n'
+                  'The answer is randomly selected from the specified list.'
+    )
+
+    child_trigger = models.ForeignKey(
+        "self",
+        on_delete=models.deletion.SET_NULL,
+        default=None,
+        null=True,
+        blank=True,
+        related_name='from_child',
+        verbose_name='Child trigger'
+    )
+
+    parent_trigger = models.ForeignKey(
+        "self",
+        on_delete=models.deletion.SET_NULL,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name='Parent trigger'
     )
 
     is_enabled = models.BooleanField(
         default=True,
         blank=True,
         null=True,
-        verbose_name='Активно'
+        verbose_name='Is Enabled'
+    )
+
+    is_entrypoint_instance = models.BooleanField(
+        default=False,
+        null=True,
+        blank=True,
+        verbose_name='Is entrypoint instance'
+    )
+
+    is_exitpoint_instance = models.BooleanField(
+        default=False,
+        null=True,
+        blank=True,
+        verbose_name='Is exitpoint instance'
+    )
+
+    is_current_instance = models.BooleanField(
+        default=False,
+        null=True,
+        blank=True,
+        verbose_name='Is current instance',
+        editable=False
+    )
+
+    is_finished_instance = models.BooleanField(
+        default=False,
+        null=True,
+        blank=True,
+        verbose_name='Is finished instance',
+        editable=False
+    )
+
+    is_instance = models.BooleanField(
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name='Instance of the inside of the dialogue',
+        help_text='Automatically installed.',
+        editable=False
+    )
+
+    is_action = models.BooleanField(
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name='Executable Immediately',
+        help_text='If so, the trigger will not wait for the input word. It will be executed immediately upon call. '
+                  'Convenient for the dynamic continuation of the dialogue.',
+        # editable=False
+    )
+
+    is_reverse_action = models.BooleanField(
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name='Reverse trigger',
+        help_text='It works when the response is sent first and a trigger input is expected after the response. '
+                  'Installed automatically',
+        # editable=False
     )
 
     timestamp = models.DateTimeField(
@@ -533,8 +633,9 @@ class Trigger(Middleware):
         answers = []
         i = str(self.answers).split(',')
         for answer in i:
-            if answer[0] == ' ':
-                answers.append(answer[1:])
+            # if answer[0] == ' ':
+            #     answers.append(answer[1:])
+            answers.append(answer)
         return answers
 
     def get_random_answer(self):
@@ -545,8 +646,11 @@ class Trigger(Middleware):
         words = []
         l = str(self.words).split(',')
         for word in l:
-            if word[0] == ' ':
-                words.append(word[1:])
+            # if word[0] == ' ':
+            #     words.append(word[1:])
+            # else:
+            #     words.append(word)
+            words.append(word)
         return words
 
     def get_reasons_module(self):
@@ -558,26 +662,50 @@ class Trigger(Middleware):
         return reason
 
     def __str__(self):
-        return str(self.words)
+        return f"id: {self.id}, {self.title}"
 
     def save(self, *args, **kwargs):
-        print(self.middleware_type)
-        if self.middleware_type == 'DefaultTriggerReason':
-            pass
+        if self.is_exitpoint_instance:
+            self.is_instance = False
+
+        elif self.is_entrypoint_instance:
+            self.is_instance = False
+
+        elif not self.is_entrypoint_instance and not self.is_exitpoint_instance:
+            self.is_instance = True
+
+        if self.words:
+            self.is_action = False
+
+        elif not self.words and self.is_instance:
+            self.is_action = True
+
+        if self.is_instance and not self.words:
+            self.is_reverse_action = False
+
+        elif self.is_instance and self.words:
+            self.is_reverse_action = True
+
+        if self.is_exitpoint_instance:
+            self.is_reverse_action = False
+
+        if self.is_entrypoint_instance:
+            self.is_reverse_action = False
+
         return super(Trigger, self).save(*args, **kwargs)
 
     class Meta:
-        verbose_name = 'триггер'
-        verbose_name_plural = 'триггеры'
+        verbose_name = 'trigger'
+        verbose_name_plural = 'triggers'
 
 
-class BaseScene(models.Model):
+class Scene(models.Model):
     title = models.CharField(
         max_length=255,
         default=None,
         null=True,
         blank=True,
-        verbose_name='Сценарий'
+        verbose_name='Scene'
     )
 
     app = models.ForeignKey(
@@ -586,21 +714,21 @@ class BaseScene(models.Model):
         default=None,
         null=True,
         blank=True,
-        verbose_name='Приложение'
+        verbose_name='Application'
     )
 
     triggers = models.ManyToManyField(
         "telegram.Trigger",
         default=None,
         blank=True,
-        verbose_name='Триггеры',
+        verbose_name='Triggers',
     )
 
     is_enabled = models.BooleanField(
         default=False,
         null=True,
         blank=True,
-        verbose_name='Активный'
+        verbose_name='Is enabled'
     )
 
     timestamp = models.DateTimeField(
@@ -613,92 +741,33 @@ class BaseScene(models.Model):
         return f"id: {self.id}, {self.title}"
 
     class Meta:
-        verbose_name = 'родительская сцена'
-        verbose_name_plural = 'родительские сцены'
+        verbose_name = 'scene'
+        verbose_name_plural = 'scenes'
 
 
-class SceneInstance(BaseScene):
-    is_current_instance = models.BooleanField(
-        default=False,
-        null=True,
-        blank=True,
-        help_text='Не доступно для ручного изменения.',
-        editable=False,
-    )
-
-    is_finished_instance = models.BooleanField(
-        default=False,
-        null=True,
-        blank=True,
-        help_text='Не доступно для ручного изменения.',
-        editable=False,
-    )
-
-    is_message = models.BooleanField(
-        default=None,
-        null=True,
-        blank=True,
-        editable=False,
-    )
-
-    message_type = models.CharField(
-        max_length=255,
-        choices=Message.MESSAGE_TYPE_CHOICES,
-        default=None,
-        null=True,
-        blank=True,
-        verbose_name='Тип сообщения'
-    )
-    message_id = models.PositiveIntegerField(
-        default=None,
-        null=True,
-        blank=True,
-        verbose_name='ID сообщения'
-    )
-
-    text = models.TextField(
-        default=None,
-        null=True,
-        blank=True,
-        verbose_name='Текст сообщения'
-    )
-
-    sender_id = models.PositiveIntegerField(
-        default=None,
-        null=True,
-        blank=True,
-        verbose_name='ID отправителя'
-    )
-
-    sender_username = models.CharField(
-        db_index=True,
-        max_length=255,
-        default=None,
-        null=True,
-        blank=True,
-        verbose_name='Телеграм юзер'
-    )
-    sender_first_name = models.CharField(
-        max_length=255,
-        default=None,
-        null=True,
-        blank=True,
-        verbose_name='Имя'
-    )
-    sender_last_name = models.CharField(
-        max_length=255,
-        default=None,
-        null=True,
-        blank=True,
-        verbose_name='Фамилия'
-    )
-
-    def __str__(self):
-        return f"id: {self.id}, {self.title}, sender_username: {self.sender_username}"
-
-    class Meta:
-        verbose_name = 'сцена сообщения'
-        verbose_name_plural = 'сцены сообщений'
+# class TriggerInstance(Trigger):
+#     sender_id = models.PositiveIntegerField(
+#         default=None,
+#         null=True,
+#         blank=True,
+#         verbose_name='Sender id'
+#     )
+#
+#     sender_username = models.CharField(
+#         db_index=True,
+#         max_length=255,
+#         default=None,
+#         null=True,
+#         blank=True,
+#         verbose_name='Sender username'
+#     )
+#
+#     def __str__(self):
+#         return f"id: {self.id}, {self.title}, sender_username: {self.sender_username}"
+#
+#     class Meta:
+#         verbose_name = 'сцена сообщения'
+#         verbose_name_plural = 'сцены сообщений'
 
 class History(models.Model):
 
@@ -706,7 +775,8 @@ class History(models.Model):
         default=None,
         blank=True,
         null=True,
-        verbose_name='Предмет истории'
+        verbose_name='Subject of history',
+        help_text='Will be fixed'
     )
 
     is_error = models.BooleanField(
@@ -725,5 +795,5 @@ class History(models.Model):
         return f"id: {self.id}, is_error: {self.is_error}, {self.timestamp}"
 
     class Meta:
-        verbose_name = 'история'
-        verbose_name_plural = 'истории'
+        verbose_name = 'history'
+        verbose_name_plural = 'history'

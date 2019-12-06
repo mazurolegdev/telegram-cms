@@ -1,23 +1,23 @@
 import asyncio
-import os
 import ssl
 import time
-from sqlite3 import OperationalError
+import json
 
 import certifi
 import requests
 from aiohttp import web
 from aiohttp.client import ClientSession
 from aiojobs.aiohttp import setup, spawn
-from apps.telegram.utils import parse_message
 from pyrogram import Client
+
+from apps.telegram.utils import parse_message
+from main.settings import DJANGO_SERVER_URL
 
 routes = web.RouteTableDef()
 loop = asyncio.get_event_loop()
 ssl_context = ssl.create_default_context(cafile=certifi.where())
 
-DJANGO_SERVER_URL = os.environ.get('DJANGO_SERVER_URL')
-base_link = f'{DJANGO_SERVER_URL}/api/telegram/config/1/012d080a0f9211eab83d0242ac190002012d0b980f9211eab83d0242ac190002/'
+GET_CONFIG_LIST = f'{DJANGO_SERVER_URL}/api/telegram/config/all/'
 link = f'{DJANGO_SERVER_URL}/api/telegram/'
 create_message_link = f'{link}message'
 
@@ -39,7 +39,7 @@ async def gen_session():
 
 async def get_configs():
     session = await gen_session()
-    response = await session.get(base_link, headers=headers, ssl=ssl_context)
+    response = await session.get(GET_CONFIG_LIST, headers=headers, ssl=ssl_context)
     await session.close()
     return await response.json()
 
@@ -51,13 +51,43 @@ async def get_event_loop():
         return asyncio.get_running_loop()
 
 
-async def get_telegram_app():
-    loop = await get_event_loop()
-    try:
-        return loop.telegram_app
-    except:
-        await logger('No one loop is running or no one telegram app')
-        return None
+class TelegramAppConnector:
+    def __init__(self, data=None):
+        self.connectors = []
+        self.default_connector = None
+        if data:
+            self.app = data['app']
+            self.app_id = data['app_id']
+            self.api_hash = data['api_hash']
+            self.session_name = data['session_name']
+            self.session_string = data['session_string']
+            self.is_bot_session = data['is_bot_session']
+            self.is_ready = data['is_ready']
+            self.is_active = data['is_active']
+            self.connected = data['connected']
+
+    def add(self, connector, default=None):
+        assert isinstance(connector, TelegramAppConnector)
+        self.connectors.append(connector)
+
+        if default:
+            self.default_connector = connector
+
+    def get_default_connector(self):
+        return self.default_connector
+
+    def get(self, data):
+        is_bot_session = bool(data['is_bot_session'])
+        app_id = int(data['app_id'])
+        session_name = str(data['session_name'])
+        session_string = str(data['session_string'])
+
+        for connector in self.connectors:
+            if str(connector.session_string) == session_string and bool(connector.is_bot_session) == is_bot_session:
+                return connector
+
+
+connector = TelegramAppConnector()
 
 
 class Telegram:
@@ -65,6 +95,9 @@ class Telegram:
     def __init__(self, config=None):
         self.app = None
         self.django_telegram_link = link
+        self.init_apps = []
+        self.connector = None
+        self.session_string = None
 
         if config:
             self.config = config
@@ -74,9 +107,9 @@ class Telegram:
             self.api_hash = self.config['api_hash']
             self.access_token = self.config['access_token']
             self.bot_token = self.config['bot_token']
-            self.is_bot = self.config['is_bot']
-            self.is_active = self.config['is_active']
-            self.is_ready = self.config['is_ready']
+            self.is_bot = bool(self.config['is_bot'])
+            self.is_active = bool(self.config['is_active'])
+            self.is_ready = bool(self.config['is_ready'])
 
     async def run_session(self):
         if self.is_ready:
@@ -86,7 +119,6 @@ class Telegram:
 
     def send_message(self, to, text):
         self.app.send_message(to, text)
-        # await logger(f"sended message [{text}] to [{to}]")
 
     async def run(self):
         if self.is_bot:
@@ -101,7 +133,6 @@ class Telegram:
                 device_model='MacBookPro12,1, macOS 10.14.6',
                 app_version='Telegram macOS 5.8 (185085) APPSTORE',
                 system_version='Darwin 18.7.0',
-                # test_mode=True,
             )
 
         if not self.is_bot:
@@ -117,7 +148,6 @@ class Telegram:
                 system_version='Darwin 18.7.0',
             )
 
-        # await self.change_device_model(self.app)
         @self.app.on_message()
         def message_handler(client, message):
             result = parse_message(message)
@@ -125,6 +155,9 @@ class Telegram:
                 "id": self.django_config_id,
                 "access_token": self.access_token,
                 "app_id": self.api_id,
+                "api_hash": self.api_hash,
+                "session_name": self.session_name,
+                "is_bot_session": self.is_bot,
             })
             requests.post(create_message_link, data=result)
 
@@ -136,48 +169,70 @@ class Telegram:
         self.app.add_handler(message_handler)
         self.app.add_handler(disconnect_handler)
         self.app.start()
-        # self.session_string = self.app.export_session_string()
-        loop = await get_event_loop()
-        loop.telegram_app = self
+
+        self.session_string = self.app.export_session_string()
+
+        app_data = {
+            "app_id": self.api_id,
+            "api_hash": self.api_hash,
+            "session_name": self.session_name,
+            "session_string": self.session_string,
+            "access_token": self.access_token,
+            "is_bot_session": self.is_bot,
+            "is_ready": self.is_ready,
+            "is_active": self.is_active,
+            "connected": self.app.is_connected,
+        }
+
+        requests.post(f'{DJANGO_SERVER_URL}/api/telegram/config', data=app_data)
+
+        app_data.update({
+            "app": self.app,
+        })
+        self.connector = TelegramAppConnector(app_data)
+
+        if not self.is_bot:
+            connector.add(self.connector, default=True)
+        else:
+            connector.add(self.connector)
 
     async def get_config(self):
         return self.config
+
+
+async def fetch(configs):
+    for config in configs:
+        app = Telegram(config)
+        await app.run_session()
 
 
 @routes.get('/')
 async def home(request):
     await spawn(request, logger(request))
     try:
-        app = Telegram(await get_configs())
-        await app.run_session()
-        return web.json_response(await app.get_config())
-    except OperationalError:
-        return web.json_response({"status": "already running or operational error"})
+        configs = await get_configs()
+
+        await fetch(configs)
+        return web.json_response({"configs": configs})
     except:
-        return web.json_response({"status": "unknown error"})
+        return web.json_response({"status": "already running or operational error"})
 
 
 @routes.post('/message/send')
-async def get_current_apps(request):
+async def send_message(request):
     await spawn(request, logger(request))
+
     data = await request.post()
+    connection = connector.get(data)
+
+    if not connection:
+        connection = connector.get_default_connector()
 
     id_to = data['id_to']
     text = data['text']
 
-    app = await get_telegram_app()
-    app.send_message(id_to, text)
-
-    return web.json_response({"status": {
-        "id_to": id_to,
-        "text": text
-    }})
-
-
-@routes.get('/get_updates')
-async def get_updates(request):
-    await spawn(request, logger(request))
-    return web.json_response({"page": "get_updates"})
+    connection.app.send_message(id_to, text)
+    return web.json_response({"page": "get_connector"})
 
 
 app = web.Application()

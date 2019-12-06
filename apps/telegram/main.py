@@ -1,4 +1,6 @@
 import asyncio
+import os
+import subprocess
 # from utils import log
 
 from pyrogram import Client
@@ -14,16 +16,16 @@ loop = asyncio.get_event_loop()
 def change_device_model(app, model):
     app.DEVICE_MODEL = model
 
-def create_session_from_command_line():
+def create_session_from_main():
     print('Чтобу получить API доступ к вашему аккаунту и создать сессию,'
           'Нужно перейти по ссылке https://my.telegram.org/ и авторизоваться.'
           'Далее создать приложение с любым названием и любой платформой.'
           'Как правило название это набор рандомных символов. Это нормально.'
           'Далее вы получите API_ID и API_HASH. Их нужно будет вставить по инструкции ниже,'
           'чтобы инициализировать сессию вашего телеграм аккаунта.')
-    api_id = input("Введите API_ID:")
-    api_hash = input("Введите API_HASH:")
-    session_name = input("Введите название сессии (только латинница):")
+    api_id = input('api_id:')
+    api_hash = input('api_hash:')
+    session_name = input('session_name:')
 
     app = Client(
         session_name,
@@ -38,10 +40,43 @@ def create_session_from_command_line():
         app.start()
         app.stop()
         print(f"Сессия успешно создана. Теперь она находится в папке apps/telegram/sessions "
-              f"и будет использоваться в дальнейшем для коммуникации с телеграм API."
-              f"API_ID: {api_id}."
-              f"API_HASH: {api_hash}"
-              f"SESSION_NAME: {session_name}")
+              f"и будет использоваться в дальнейшем для коммуникации с телеграм API.\n"
+              f"API_ID: {api_id}\n"
+              f"API_HASH: {api_hash}\n"
+              f"SESSION_NAME: {session_name}\n")
+
+    except:
+        print("Не удалось создать сессию. Что-то пошло не так. :(")
+
+def create_session_from_command_line(api_id: int, api_hash: str, session_name: str):
+    print('Чтобу получить API доступ к вашему аккаунту и создать сессию,'
+          'Нужно перейти по ссылке https://my.telegram.org/ и авторизоваться.'
+          'Далее создать приложение с любым названием и любой платформой.'
+          'Как правило название это набор рандомных символов. Это нормально.'
+          'Далее вы получите API_ID и API_HASH. Их нужно будет вставить по инструкции ниже,'
+          'чтобы инициализировать сессию вашего телеграм аккаунта.')
+    api_id = api_id
+    api_hash = api_hash
+    session_name = session_name
+
+    app = Client(
+        session_name,
+        api_id,
+        api_hash,
+        workdir='apps/telegram/sessions/',
+        device_model='MacBookPro13,1, macOS 10.14.6',
+        app_version='Telegram macOS 5.8 (185085) APPSTORE',
+        system_version='Darwin 18.7.0',
+    )
+    try:
+        app.start()
+        app.stop()
+        print(f"Сессия успешно создана. Теперь она находится в папке apps/telegram/sessions "
+              f"и будет использоваться в дальнейшем для коммуникации с телеграм API.\n"
+              f"API_ID: {api_id}\n"
+              f"API_HASH: {api_hash}\n"
+              f"SESSION_NAME: {session_name}\n")
+
     except:
         print("Не удалось создать сессию. Что-то пошло не так. :(")
 
@@ -111,6 +146,6 @@ async def main(config, session):
 
 if __name__ == '__main__':
     try:
-        create_session_from_command_line()
+        create_session_from_main()
     except KeyboardInterrupt:
         pass

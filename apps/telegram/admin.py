@@ -1,6 +1,7 @@
 from django.contrib import admin
-from apps.telegram.models import Config, Message, Chat, TelegramUser, Trigger, BaseScene, SceneInstance
+from apps.telegram.models import Config, Message, Chat, TelegramUser, Trigger, Scene
 from django.http import HttpResponseRedirect
+from apps.telegram.main import create_session_from_command_line
 
 admin.site.site_header = 'Telegram CMS v0.1'               # default: "Django Administration"
 admin.site.index_title = 'Telegram CMS project'                 # default: "Site administration"
@@ -12,20 +13,31 @@ class ConfigAdmin(admin.ModelAdmin):
     list_display = ('id', 'session_name', 'api_id', 'api_hash', 'is_bot', 'is_active', 'is_ready')
 
     # change_list_template = "root/admin/change_list.html"
+    change_form_template = 'root/admin/buttons.html'
 
-@admin.register(BaseScene)
+    def response_change(self, request, obj):
+        if "_create_session" in request.POST:
+            create_session_from_command_line(int(obj.api_id), str(obj.api_hash), str(obj.session_name))
+
+            self.message_user(request, 'Сессия создана. Соединение с Telegram API установлено.')
+            return HttpResponseRedirect(".")
+        return super().response_change(request, obj)
+
+
+@admin.register(Scene)
 class SceneAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'app', 'is_enabled', 'timestamp')
 
 
-@admin.register(SceneInstance)
-class MessageSceneAdmin(admin.ModelAdmin):
-    pass
+# @admin.register(TriggerInstance)
+# class TriggerInstanceAdmin(admin.ModelAdmin):
+#     pass
 
 
 @admin.register(Trigger)
 class TriggerAdmin(admin.ModelAdmin):
-    list_display = ('id', 'middleware_type', 'is_enabled',)
+    list_display = ('id', 'title', 'parent_trigger', 'middleware_type', 'is_enabled', 'is_entrypoint_instance',
+                    'is_exitpoint_instance', 'is_current_instance', 'is_finished_instance', 'timestamp')
 
 @admin.register(TelegramUser)
 class TelegramUserAdmin(admin.ModelAdmin):
@@ -38,7 +50,7 @@ class TelegramUserAdmin(admin.ModelAdmin):
 class MessageAdmin(admin.ModelAdmin):
     list_display = ('app', 'message_id', 'message_type', )
 
-    change_form_template = 'root/admin/buttons.html'
+    # change_form_template = 'root/admin/buttons.html'
 
     def response_change(self, request, obj):
         if "_send_message" in request.POST:

@@ -5,7 +5,8 @@ class ConfigSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Config
         fields = [
-            'id', 'session_name', 'api_id', 'api_hash', 'access_token', 'bot_token', 'is_bot', 'is_active', 'is_ready'
+            'id', 'session_name', 'session_string', 'api_id', 'api_hash',
+            'access_token', 'bot_token', 'is_bot', 'is_active', 'is_ready'
         ]
 
 

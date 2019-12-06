@@ -1,0 +1,4 @@
+{
+  "DJANGO_SERVER_URL": "http://172.25.0.2:8005",
+  "ASYNC_SERVER_URL": "http://172.25.0.3:8080"
+}
