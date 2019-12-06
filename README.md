@@ -3,6 +3,31 @@
 
 ![img](http://dl3.joxi.net/drive/2019/12/06/0029/3762/1904306/06/08fa2e0135.jpg)
 
+Instruments:
+- Django framework
+- Django Rest Framework
+- Aiohttp
+- Pyrogram
+- Celery
+- Redis
+- Swagger
+- Redoc
+
+# Short architecture description:
+- Pyrogram inside aiohttp with accounts connectors and easy api.
+- Pyrogram listen all account updates and send it to Django.
+- Custom Django middlewares catch request data from aiohttp, and send it to handle tasks.
+- Tasks make business logic and send result to Aiohttp > Account connector > Pyrogram > Telegram API.
+
+# Docker containers:
+- Django
+- Aiohttp
+- Celery
+- Redis
+- Memcached
+- Nginx
+# Containers connected with network inside docker
+
 # Setup:
 - Install Docker and docker-compose
 - git clone https://github.com/codefather-labs/telegram-cms.git
