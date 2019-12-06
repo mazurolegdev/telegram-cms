@@ -4,9 +4,10 @@
 ![img](http://dl3.joxi.net/drive/2019/12/06/0029/3762/1904306/06/08fa2e0135.jpg)
 
 Instruments:
+- Docker
 - Django framework
 - Django Rest Framework
-- Aiohttp
+- Aiohttp + Aiojobs
 - Pyrogram
 - Celery
 - Redis
@@ -20,6 +21,7 @@ Instruments:
 - Pyrogram listen all account updates and send it to Django.
 - Custom Django middlewares catch request data from aiohttp, and send it to handle tasks.
 - Tasks make business logic and send result to Aiohttp > Account connector > Pyrogram > Telegram API.
+- Most of code inside Aiohttp is asynchronous.
 
 # Docker containers:
 - Django
