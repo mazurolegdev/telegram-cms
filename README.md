@@ -79,6 +79,7 @@ Now its works only for private messages!
 # Expectation in v.0.4. alpha:
 - Finish state mahine for scenes and triggers.
 - Adding new default triggers!
+- Customize CMS API for handle AI recognition patterns
 
 Developing by me for people with love <3
 
