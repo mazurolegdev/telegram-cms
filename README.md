@@ -4,16 +4,16 @@
 ![img](http://dl3.joxi.net/drive/2019/12/06/0029/3762/1904306/06/08fa2e0135.jpg)
 
 Instruments:
-- Docker
-- Django framework
-- Django Rest Framework
-- Django Channels
-- Aiohttp + Aiojobs
-- Pyrogram
-- Celery
-- Redis
-- Swagger
-- Redoc
+- [Docker](https://www.docker.com/)
+- [Django framework](https://www.djangoproject.com/)
+- [Django Rest Framework](https://www.django-rest-framework.org/)
+- [Django Channels](https://channels.readthedocs.io/en/latest/)
+- [Aiohttp](https://aiohttp.readthedocs.io/en/stable/) + [Aiojobs](https://aiojobs.readthedocs.io/en/stable/quickstart.html)
+- [Pyrogram](https://docs.pyrogram.org/)
+- [Celery](http://www.celeryproject.org/)
+- [Redis](https://redis.io/)
+- [Swagger](https://swagger.io/)
+- [Redoc](https://github.com/Redocly/redoc)
 
 # Short architecture description:
 - State machine inside Django's MVC and Aiohttp. Both got API.
