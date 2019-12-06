@@ -13,7 +13,7 @@
 - login: admin
 - password: admin
 
-# This build is for local demonstration or for UNSAFE local usind only!
+# This build is for demonstration or for UNSAFE local using only!
 For production using, you need change database!
 
 # Before start use Telegram CMS, > Entry with telegram API:
