@@ -1,13 +1,10 @@
-import re
-import uuid
 import random
+import uuid
+from importlib import import_module
 
 import requests
-from apps.telegram.middlewares import TriggerMiddleware
-from apps.telegram.reasons import DefaultTriggerReason
 from django.conf import settings
 from django.db import models
-from importlib import import_module
 
 
 def models_logger(message):
@@ -465,20 +462,21 @@ class Message(models.Model):
                 )
 
         if self.chat_id:
-            try:
-                chat = Chat.objects.get(tg_chat_id=self.chat_id)
-                chat.update_from_message(
-                    self.chat_title,
-                    self.chat_type,
-                    self.chat_username
-                )
-            except:
-                Chat.create_from_message(
-                    self.chat_id,
-                    self.chat_type,
-                    self.chat_title,
-                    self.chat_username,
-                )
+            if not self.chat_type == 'private':
+                try:
+                    chat = Chat.objects.get(tg_chat_id=self.chat_id)
+                    chat.update_from_message(
+                        self.chat_title,
+                        self.chat_type,
+                        self.chat_username
+                    )
+                except:
+                    Chat.create_from_message(
+                        self.chat_id,
+                        self.chat_type,
+                        self.chat_title,
+                        self.chat_username,
+                    )
         models_logger(f"Saved Telegram message {self.message_id}")
         return super(Message, self).save(*args, **kwargs)
 
@@ -509,7 +507,6 @@ class Middleware(models.Model):
 
 
 class Trigger(Middleware):
-
     title = models.CharField(
         max_length=255,
         default=None,
@@ -745,32 +742,113 @@ class Scene(models.Model):
         verbose_name_plural = 'scenes'
 
 
-# class TriggerInstance(Trigger):
-#     sender_id = models.PositiveIntegerField(
-#         default=None,
-#         null=True,
-#         blank=True,
-#         verbose_name='Sender id'
-#     )
-#
-#     sender_username = models.CharField(
-#         db_index=True,
-#         max_length=255,
-#         default=None,
-#         null=True,
-#         blank=True,
-#         verbose_name='Sender username'
-#     )
-#
-#     def __str__(self):
-#         return f"id: {self.id}, {self.title}, sender_username: {self.sender_username}"
-#
-#     class Meta:
-#         verbose_name = 'сцена сообщения'
-#         verbose_name_plural = 'сцены сообщений'
+class BaseChatListener(models.Model):
+
+    LISTENER_CHOICES = (
+        ("DefaultChatListener", "Default Chat Listener"),
+        # ("DefaultPostListener", "Default Post Listener"),
+    )
+
+    app = models.ForeignKey(
+        "telegram.Config",
+        on_delete=models.deletion.SET_NULL,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name='Application'
+    )
+
+    listener_type = models.CharField(
+        max_length=255,
+        choices=LISTENER_CHOICES,
+        default=None,
+        null=True,
+        blank=False,
+        verbose_name='Type'
+    )
+
+    is_enabled = models.BooleanField(
+        default=False,
+        null=True,
+        blank=True,
+        verbose_name='Is enabled'
+    )
+
+    auto_publishing_is_enabled = models.BooleanField(
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name='Automatic publishing is enabled'
+    )
+
+    publications_saving = models.BooleanField(
+        default=True,
+        null=True,
+        blank=True,
+        verbose_name='Automatic saving publication'
+    )
+
+    timestamp = models.DateTimeField(
+        auto_now=True,
+        blank=True,
+        null=True,
+    )
+
+    def get_listener_module(self):
+        return import_module('apps.telegram.listeners')
+
+    def get_listener(self):
+        listener_module = self.get_listener_module()
+        listener = getattr(listener_module, str(self.listener_type))
+        return listener
+
+    class Meta:
+        verbose_name = 'listener'
+        verbose_name_plural = 'listeners'
+
+
+class ChatListener(BaseChatListener):
+
+    from_chat = models.ForeignKey(
+        "telegram.Chat",
+        on_delete=models.deletion.SET_NULL,
+        default=None,
+        null=True,
+        blank=True,
+        related_name='from_chat_listener',
+        verbose_name='From chat'
+    )
+
+    to_chat = models.ForeignKey(
+        "telegram.Chat",
+        on_delete=models.deletion.SET_NULL,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name='To chat'
+    )
+
+    # messages = models.ManyToManyField(
+    #     "telegram.Message",
+    #     default=None,
+    #     blank=True,
+    #     verbose_name='Messages',
+    #     help_text='*mark as non editable field'
+    # )
+
+    def __str__(self):
+        return f"ID: {self.id}, from: {self.from_chat}, to: {self.to_chat}"
+
+    class Meta:
+        verbose_name = 'chat listener'
+        verbose_name_plural = 'chats listeners'
+
+
+# class PostListener(Listener):
+#     pass
+
 
 class History(models.Model):
-
     subject = models.TextField(
         default=None,
         blank=True,

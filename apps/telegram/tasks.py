@@ -2,10 +2,29 @@ import requests
 from django.conf import settings
 from django.utils.datastructures import MultiValueDictKeyError
 
-from apps.telegram.models import Config, Scene
-from apps.telegram.utils import telegram_logger
+from apps.telegram.models import Config, Scene, ChatListener
+from apps.telegram.utils import telegram_logger, DataCleaner, Sender
 from main.celery import app
 
+
+class ChatListenerTasks:
+
+    @staticmethod
+    @app.task()
+    def default_chat_listener_task(data):
+        chat_id = data['chat_id']
+        chat_username = data['chat_username']
+        chat_type = data['chat_type']
+        text = data['text']
+
+        listeners = ChatListener.objects.filter(is_enabled=True)
+
+        for listener in listeners:
+            if listener.auto_publishing_is_enabled:
+                if str(chat_id) == str(listener.from_chat.tg_chat_id):
+                    response_data = DataCleaner.clean_response_chat_data(data, listener)
+                    response_data.update({"text": data['text']})
+                    Sender.send_message(response_data)
 
 class TriggerMiddlewareTasks:
 
@@ -30,15 +49,16 @@ class TriggerMiddlewareTasks:
         # FIXME
         current_trigger_instance = None
 
-        for trigger in triggers[0]:
-            if trigger.is_enabled and trigger.middleware_type:
-                try:
-                    trigger.get_reason().start(
-                        trigger, data, app, current_trigger_instance
-                    )
+        if triggers:
+            for trigger in triggers[0]:
+                if trigger.is_enabled and trigger.middleware_type:
+                    try:
+                        trigger.get_reason().start(
+                            trigger, data, app, current_trigger_instance
+                        )
 
-                except MultiValueDictKeyError:
-                    telegram_logger(f"Catch MultiValueDictKeyError at private_pre_task. Data {data}")
+                    except MultiValueDictKeyError:
+                        telegram_logger(f"Catch MultiValueDictKeyError at private_pre_task. Data {data}")
 
     @staticmethod
     @app.task()

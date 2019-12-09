@@ -1,5 +1,7 @@
 from django.contrib import admin
-from apps.telegram.models import Config, Message, Chat, TelegramUser, Trigger, Scene
+from apps.telegram.models import (
+    Config, Message, Chat, TelegramUser, Trigger, Scene, ChatListener
+)
 from django.http import HttpResponseRedirect
 from apps.telegram.main import create_session_from_command_line
 
@@ -29,9 +31,9 @@ class SceneAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'app', 'is_enabled', 'timestamp')
 
 
-# @admin.register(TriggerInstance)
-# class TriggerInstanceAdmin(admin.ModelAdmin):
-#     pass
+@admin.register(ChatListener)
+class ChatListenerAdmin(admin.ModelAdmin):
+    pass
 
 
 @admin.register(Trigger)

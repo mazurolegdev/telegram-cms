@@ -1,11 +1,14 @@
 from django.utils.datastructures import MultiValueDictKeyError
 from rest_framework import status
 from rest_framework.response import Response
+from apps.telegram.models import ChatListener, Config
+from apps.telegram.utils import telegram_logger, Sender, DataCleaner
+from apps.telegram.api.serializers import ConfigSerializer
+from apps.telegram.tasks import TriggerMiddlewareTasks, ChatListenerTasks
 
 
 class RequestsMiddleware:
     def __init__(self):
-        from apps.telegram.utils import telegram_logger
         self.logger = telegram_logger
 
     def post(self, func):
@@ -20,14 +23,10 @@ class RequestsMiddleware:
 
 class ApplicationMiddleware:
     def __init__(self):
-        from apps.telegram.utils import telegram_logger
         self.logger = telegram_logger
 
     def update(self, func):
         def wrapper(request, *args, **kwargs):
-            from apps.telegram.models import Config
-            from apps.telegram.api.serializers import ConfigSerializer
-
             app_id = request.data['app_id']
             api_hash = request.data['api_hash']
             session_name = request.data['session_name']
@@ -60,8 +59,6 @@ class ApplicationMiddleware:
 
 class TriggerMiddleware:
     def __init__(self):
-        from apps.telegram.utils import telegram_logger
-        from apps.telegram.tasks import TriggerMiddlewareTasks
         self.logger = telegram_logger
         self.task = TriggerMiddlewareTasks()
 
@@ -85,5 +82,19 @@ class TriggerMiddleware:
             else:
                 self.logger(f"Catch non private message", self)
                 return func(request, *args, **kwargs)
+
+        return wrapper
+
+
+class ListenerMiddleware:
+    def __init__(self):
+        self.logger = telegram_logger
+        self.task = ChatListenerTasks()
+
+    def chat(self, func):
+        def wrapper(request, *args, **kwargs):
+            if request.data['chat_type'] != 'private':
+                self.task.default_chat_listener_task(request.data)
+            return func(request, *args, **kwargs)
 
         return wrapper

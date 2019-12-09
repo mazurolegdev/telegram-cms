@@ -1,6 +1,8 @@
 from apps.telegram.api.serializers import ConfigSerializer, MessageSerializer
 from apps.telegram.models import Config
-from apps.telegram.middlewares import TriggerMiddleware, RequestsMiddleware, ApplicationMiddleware
+from apps.telegram.middlewares import (
+    TriggerMiddleware, RequestsMiddleware, ApplicationMiddleware, ListenerMiddleware
+)
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -8,6 +10,7 @@ from rest_framework.response import Response
 trigger = TriggerMiddleware()
 request = RequestsMiddleware()
 application = ApplicationMiddleware()
+listener = ListenerMiddleware()
 
 @api_view(['POST'])
 @request.post
@@ -45,6 +48,7 @@ def get_config(request, id, token, format=None):
 @api_view(['POST'])
 @request.post
 @trigger.message
+@listener.chat
 def create_message(request):
 
     try:

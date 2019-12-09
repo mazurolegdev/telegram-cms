@@ -22,15 +22,20 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'pd9g8r&z=&o4o1h#_*=bi826_=fu#@zq8le1553cpjq6cs&sw6'
 
-from main.utils import get_config
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+LOCAL = True
+
+if not LOCAL:
+    from main.utils import get_config
+
+    ASYNC_SERVER_URL = get_config()['ASYNC_SERVER_URL']
+    DJANGO_SERVER_URL = get_config()['DJANGO_SERVER_URL']
+    ASYNC_SEND_MESSAGE_URL = f"{ASYNC_SERVER_URL}/message/send"
+
 
 ALLOWED_HOSTS = ['*']
-ASYNC_SERVER_URL = get_config()['ASYNC_SERVER_URL']
-DJANGO_SERVER_URL = get_config()['DJANGO_SERVER_URL']
-ASYNC_SEND_MESSAGE_URL = f"{ASYNC_SERVER_URL}/message/send"
 
 # Application definition
 COMMON_APPS = [
@@ -66,14 +71,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-# REST_FRAMEWORK = {
-#     # Use Django's standard `django.contrib.auth` permissions,
-#     # or allow read-only access for unauthenticated users.
-#     'DEFAULT_PERMISSION_CLASSES': [
-#         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-#     ]
-# }
 
 ROOT_URLCONF = 'main.urls'
 

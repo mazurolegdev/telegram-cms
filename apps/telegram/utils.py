@@ -1,50 +1,29 @@
 from django.conf import settings
+import requests
 
 
-# def get_common_apps_path():
-#     return f"{os.getcwd()}/apps/common"
-#
-#
-# def change_dir(path):
-#     if os.getcwd() != '/app/apps/common':
-#         return os.chdir(path)
-#     else:
-#         return
-#
-#
-# def get_reason_modules_from_path(path):
-#     modules = []
-#     for dir in os.listdir(path):
-#         if os.path.isdir(dir):
-#             try:
-#                 modules.append(import_module(f'apps.common.{dir}.reasons'))
-#             except:
-#                 pass
-#
-#     return modules
-#
-#
-# def get_reasons_list():
-#     common_apps_path = get_common_apps_path()
-#     common_apps_dir = change_dir(common_apps_path)
-#     modules = get_reason_modules_from_path(os.getcwd())
-#     return modules
-#
-#
-# def get_class_path_from_reasons_list():
-#     modules = get_reasons_list()
-#     # print(modules)
-#     reasons = []
-#
-#     for module in modules:
-#
-#         # print(getattr(module, 'Reason'))
-#         try:
-#             reasons.append(str(module.Reason.__module__))
-#         except:
-#             pass
-#
-#     return reasons
+class Sender:
+
+    @staticmethod
+    def send_message(data):
+        async_server_url = settings.ASYNC_SERVER_URL
+        send_message_url = f"{async_server_url}/message/send"
+        requests.post(send_message_url, data=data)
+
+class DataCleaner:
+
+    @staticmethod
+    def clean_response_chat_data(data, listener):
+        return {
+            "id_to": str(listener.to_chat.tg_chat_id),
+            "session_name": data['session_name'],
+            "app_id": data['app_id'],
+            "api_hash": data['api_hash'],
+            "session_string": str(listener.app.session_string),
+            "is_bot_session": data['is_bot_session']
+        }
+
+
 
 def get_triggers_from_scene(scene):
     triggers = []
