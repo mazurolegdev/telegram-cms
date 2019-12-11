@@ -21,8 +21,9 @@ Instruments:
 - It can parse all account contacts and dialogs
 - It can talk with users using Triggers System
 - It can broadcast any posts of any channels and groups to your channel or your contact. Even if you are not a admin of parsed group.
+- It can broadcast content from any groups and channels to any groups and channels with Group Listeners. Even if you are not a admin of parsed group. [need fix]
 - It can broadcast content from RSS Feeds to any groups and channels with RSS Listeners. Even if you are not a admin of parsed group. [need fix]
-- It can broadcast schedule content to any groups and channels with Group Listeners. Even if you are not a admin of parsed group. [need fix]
+- It can schedule content to any groups and channels. Even if you are not a admin of parsed group. [need fix]
 - It got handle API for 90% of features. [not started yet]
 - It can handle API for Text Recognitions. [not started yet]
 - It can make visit statistics for any groups and channels you want. [not started yet]
