@@ -107,18 +107,17 @@ For production using, you need change database!
 - added telegram plugin to django-admin-panel for session usage
 - and more other awesome things!
 
-# Default Trigger Middleware Usage:
-Check for your app is fully connected to telegram api. Create post.view with django rest framework. import middleware decorator this way - from apps.telegram.middlewares import TriggerMiddleware, and init it like this - trigger = TriggerMiddleware(), then add to your post.view this way decorator:
-
+# Listener Middleware Usage:
+Check for your app is fully connected to telegram api. Create post.view with django rest framework, and go this way:
+- from apps.telegram.middlewares import ListenerMiddleware
+- listener = ListenerMiddleware()
 
 - @api_view(['POST'])
-- @trigger.message
+- @listener.message
 - def create_message(request):
 -   ...
 
-Now, you should create Base scene in django admin panel and add some triggers with triggered words and answers.
-Now its completly done for catch triggers messages with words and answers you want!
-Now its works only for private messages!
+Now, all of incoming messages will be handle with ListenerMiddlware, wich got default functions for all kinds of messages. You should create Base scene in django admin panel and add some triggers with triggered words and answers, for Trigger Middleware handle private messages. Add groups listeners for Listener Middleware handle non private messages.
 
 # Expectation in v.0.4. alpha:
 - Finish state mahine for scenes and triggers. +
