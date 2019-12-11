@@ -20,6 +20,7 @@ ssl_context = ssl.create_default_context(cafile=certifi.where())
 GET_CONFIG_LIST = f'{DJANGO_SERVER_URL}/api/telegram/config/all/'
 link = f'{DJANGO_SERVER_URL}/api/telegram/'
 create_message_link = f'{link}message'
+create_group_url = f"{DJANGO_SERVER_URL}/api/telegram/group"
 
 headers = {
     "content-type": "application/json",
@@ -56,6 +57,7 @@ class TelegramAppConnector:
         self.connectors = []
         self.default_connector = None
         if data:
+            self.telegram_instance = data['telegram_instance']
             self.app = data['app']
             self.app_id = data['app_id']
             self.api_hash = data['api_hash']
@@ -98,6 +100,7 @@ class Telegram:
         self.init_apps = []
         self.connector = None
         self.session_string = None
+        self.groups = []
 
         if config:
             self.config = config
@@ -116,6 +119,35 @@ class Telegram:
             await self.run()
         else:
             await logger('config is not ready!')
+
+    def get_updates_groups(self):
+        for line in self.app.get_dialogs():
+            if line['chat']['type'] != 'private' and line['chat']['type'] != 'bot':
+                if not line['chat'] in self.groups:
+                    chat = line['chat']
+                    permissions = chat['permissions']
+                    data = {
+                        "id": str(chat['id']),
+                        "type": str(chat['type']),
+                        "is_verified": bool(chat['is_verified']),
+                        "is_restricted": bool(chat['is_restricted']),
+                        "is_scam": bool(chat['is_scam']),
+                        "title": str(chat['title']),
+                        "username": str(chat['username']),
+                        # "can_send_messages": bool(permissions['can_send_messages']),
+                        # "can_send_media_messages": bool(permissions['can_send_media_messages']),
+                        # "can_send_other_messages": bool(permissions['can_send_other_messages']),
+                        # "can_add_web_page_previews": bool(permissions['can_add_web_page_previews']),
+                        # "can_send_polls": bool(permissions['can_send_polls']),
+                        # "can_change_info": bool(permissions['can_change_info']),
+                        # "can_invite_users": bool(permissions['can_invite_users']),
+                        # "can_pin_messages": bool(permissions['can_pin_messages']),
+                    }
+                    self.groups.append(data)
+        return self.groups
+
+    def get_groups(self):
+        return self.groups
 
     def send_message(self, to, text):
         self.app.send_message(to, text)
@@ -187,6 +219,7 @@ class Telegram:
         requests.post(f'{DJANGO_SERVER_URL}/api/telegram/config', data=app_data)
 
         app_data.update({
+            "telegram_instance": self,
             "app": self.app,
         })
         self.connector = TelegramAppConnector(app_data)
@@ -216,6 +249,18 @@ async def home(request):
         return web.json_response({"configs": configs})
     except:
         return web.json_response({"status": "already running or operational error"})
+
+@routes.post('/get_groups')
+async def get_groups(request):
+    await spawn(request, logger(request))
+
+    data = await request.post()
+    connection = connector.get(data)
+
+    if not connection:
+        connection = connector.get_default_connector()
+
+    return web.json_response(connection.telegram_instance.get_updates_groups())
 
 
 @routes.post('/message/send')

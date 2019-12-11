@@ -1,13 +1,12 @@
 from apps.telegram.api.serializers import ConfigSerializer, MessageSerializer
 from apps.telegram.models import Config
 from apps.telegram.middlewares import (
-    TriggerMiddleware, RequestsMiddleware, ApplicationMiddleware, ListenerMiddleware
+    RequestsMiddleware, ApplicationMiddleware, ListenerMiddleware
 )
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-trigger = TriggerMiddleware()
 request = RequestsMiddleware()
 application = ApplicationMiddleware()
 listener = ListenerMiddleware()
@@ -47,8 +46,7 @@ def get_config(request, id, token, format=None):
 
 @api_view(['POST'])
 @request.post
-@trigger.message
-@listener.chat
+@listener.message
 def create_message(request):
 
     try:
@@ -69,4 +67,3 @@ def create_message(request):
 
     except Config.DoesNotExist:
         return Response(status=status.HTTP_204_NO_CONTENT)
-

@@ -237,8 +237,8 @@ class Chat(models.Model):
     )
 
     class Meta:
-        verbose_name = 'chat'
-        verbose_name_plural = 'Chats'
+        verbose_name = 'group'
+        verbose_name_plural = 'groups'
 
     def __str__(self):
         return f"{self.tg_chat_title}"
@@ -840,8 +840,8 @@ class ChatListener(BaseChatListener):
         return f"ID: {self.id}, from: {self.from_chat}, to: {self.to_chat}"
 
     class Meta:
-        verbose_name = 'chat listener'
-        verbose_name_plural = 'chats listeners'
+        verbose_name = 'group listener'
+        verbose_name_plural = 'group listeners'
 
 
 # class PostListener(Listener):

@@ -3,6 +3,7 @@ from apps.telegram.models import (
     Config, Message, Chat, TelegramUser, Trigger, Scene, ChatListener
 )
 from django.http import HttpResponseRedirect
+from apps.telegram.tasks import Group
 from apps.telegram.main import create_session_from_command_line
 
 admin.site.site_header = 'Telegram CMS v0.1'               # default: "Django Administration"
@@ -22,6 +23,10 @@ class ConfigAdmin(admin.ModelAdmin):
             create_session_from_command_line(int(obj.api_id), str(obj.api_hash), str(obj.session_name))
 
             self.message_user(request, 'Сессия создана. Соединение с Telegram API установлено.')
+            return HttpResponseRedirect(".")
+        elif "_get_groups" in request.POST:
+            Group.get_groups.delay(int(obj.id))
+            self.message_user(request, 'Задача на обновление всех групп создана. Осуществляется в до 5 секунд.')
             return HttpResponseRedirect(".")
         return super().response_change(request, obj)
 

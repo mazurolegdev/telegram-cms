@@ -57,44 +57,60 @@ class ApplicationMiddleware:
         return wrapper
 
 
-class TriggerMiddleware:
-    def __init__(self):
-        self.logger = telegram_logger
-        self.task = TriggerMiddlewareTasks()
-
-    def message(self, func):
-        def wrapper(request, *args, **kwargs):
-
-            if request.data['chat_type'] == 'private':
-                self.logger(f"Catch private message", self)
-
-                try:
-                    self.task.private_pre_task.delay(request.data)
-
-                    # here you can do what ever you want
-
-                    self.task.private_post_task.delay()
-                    return func(request, *args, **kwargs)
-
-                except MultiValueDictKeyError:
-                    return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-            else:
-                self.logger(f"Catch non private message", self)
-                return func(request, *args, **kwargs)
-
-        return wrapper
+# class TriggerMiddleware:
+#     def __init__(self):
+#         self.logger = telegram_logger
+#         self.task = TriggerMiddlewareTasks()
+#
+#     def message(self, func):
+#         def wrapper(request, *args, **kwargs):
+#
+#             if request.data['chat_type'] == 'private':
+#                 self.logger(f"Catch private message", self)
+#
+#                 try:
+#                     self.task.private_pre_task.delay(request.data)
+#
+#                     # here you can do what ever you want
+#
+#                     self.task.private_post_task.delay()
+#                     return func(request, *args, **kwargs)
+#
+#                 except MultiValueDictKeyError:
+#                     return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#
+#             else:
+#                 self.logger(f"Catch non private message", self)
+#                 return func(request, *args, **kwargs)
+#
+#         return wrapper
 
 
 class ListenerMiddleware:
     def __init__(self):
         self.logger = telegram_logger
-        self.task = ChatListenerTasks()
+        self.listener_task = ChatListenerTasks()
+        self.trigger_task = TriggerMiddlewareTasks()
 
-    def chat(self, func):
+    def message(self, func):
         def wrapper(request, *args, **kwargs):
-            if request.data['chat_type'] != 'private':
-                self.task.default_chat_listener_task(request.data)
-            return func(request, *args, **kwargs)
+            if request.data['chat_type'] == 'private':
+                self.logger(f"Catch private message", self)
+
+                try:
+                    self.trigger_task.private_pre_task.delay(request.data)
+
+                    # here you can do what ever you want
+
+                    self.trigger_task.private_post_task.delay()
+                    return func(request, *args, **kwargs)
+
+                except MultiValueDictKeyError:
+                    return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            elif request.data['chat_type'] != 'private':
+                self.logger(f"Catch non private message", self)
+                self.listener_task.default_chat_listener_task(request.data)
+                return func(request, *args, **kwargs)
 
         return wrapper

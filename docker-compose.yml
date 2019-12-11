@@ -23,7 +23,7 @@ services:
     networks:
       backend:
         ipv4_address: 172.25.0.2
-#    command: gunicorn main.wsgi:application --bind 0.0.0.0:8005 --workers 2
+#    command: gunicorn main.wsgi:application --bind 0.0.0.0:8005
     command: python3 /app/manage.py runserver 0.0.0.0:8005
 
   async_server:

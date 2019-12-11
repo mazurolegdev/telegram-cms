@@ -10,6 +10,17 @@ class Sender:
         send_message_url = f"{async_server_url}/message/send"
         requests.post(send_message_url, data=data)
 
+    @staticmethod
+    def get_groups(app):
+        data = {
+            "app_id": int(app.api_id),
+            "session_name": str(app.session_name),
+            "session_string": str(app.session_string),
+            "is_bot_session": bool(app.is_bot)
+        }
+        response = requests.post(settings.ASYNC_GET_GROUPS_URL, data=data)
+        return response.text
+
 class DataCleaner:
 
     @staticmethod

@@ -33,6 +33,7 @@ if not LOCAL:
     ASYNC_SERVER_URL = get_config()['ASYNC_SERVER_URL']
     DJANGO_SERVER_URL = get_config()['DJANGO_SERVER_URL']
     ASYNC_SEND_MESSAGE_URL = f"{ASYNC_SERVER_URL}/message/send"
+    ASYNC_GET_GROUPS_URL = f"{ASYNC_SERVER_URL}/get_groups"
 
 
 ALLOWED_HOSTS = ['*']

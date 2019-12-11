@@ -4,10 +4,10 @@ from rest_framework.response import Response
 from apps.common.secret_note.models import Note
 from apps.common.secret_note.api.serializers import NoteSerializer
 
-from apps.telegram.middlewares import TriggerMiddleware
+from apps.telegram.middlewares import ListenerMiddleware
 from apps.telegram.models import Trigger
 
-trigger = TriggerMiddleware()
+listener = ListenerMiddleware()
 
 
 @api_view(['GET'])
@@ -31,7 +31,7 @@ def get_note(request, id, access_token):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
-@trigger.message
+@listener.message
 def test_middleware(request):
     if request.method == "POST":
         return Response(status=status.HTTP_200_OK)
