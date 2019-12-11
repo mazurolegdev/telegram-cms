@@ -18,11 +18,15 @@ Instruments:
 # Short feature list:
 - It works with bot's and user's accounts
 - It can parse all account groups and channels
-- It can parse all account contacts
+- It can parse all account contacts and dialogs
 - It can talk with users using Triggers System
 - It can broadcast any posts of any channels and groups to your channel or your contact. Even if you are not a admin of parsed group.
 - It can broadcast content from RSS Feeds to any groups and channels. Even if you are not a admin of parsed group. [need fix]
 - It can broadcast schedule content to any groups and channels. Even if you are not a admin of parsed group. [need fix]
+- It got handle API for 90% of features. [not started yet]
+- It can handle API for Text Recognitions. [not started yet]
+- It can make visit statistics for any groups and channels you want. [not started yet]
+- It can make sales statistics. [not started yet]
 
 # Short architecture description:
 - State machine inside Django's MVC and Aiohttp. Both got API.
@@ -116,9 +120,9 @@ Now its completly done for catch triggers messages with words and answers you wa
 Now its works only for private messages!
 
 # Expectation in v.0.4. alpha:
-- Finish state mahine for scenes and triggers.
-- Adding new default triggers!
-- Customize CMS API for handle AI recognition patterns
+- Finish state mahine for scenes and triggers. +
+- Adding new default triggers! +
+- Customize CMS API for handle AI recognition patterns ?
 
 Developing by me for people with love <3
 
