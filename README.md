@@ -15,6 +15,15 @@ Instruments:
 - [Swagger](https://swagger.io/)
 - [Redoc](https://github.com/Redocly/redoc)
 
+# Short feature list:
+- It works with bot's and user's accounts
+- It can parse all account groups and channels
+- It can parse all account contacts
+- It can talk with users using Triggers System
+- It can broadcast any posts of any channels and groups to your channel or your contact. Even if you are not a admin of parsed group.
+- It can broadcast content from RSS Feeds to any groups and channels. Even if you are not a admin of parsed group. [need fix]
+- It can broadcast schedule content to any groups and channels. Even if you are not a admin of parsed group. [need fix]
+
 # Short architecture description:
 - State machine inside Django's MVC and Aiohttp. Both got API.
 
