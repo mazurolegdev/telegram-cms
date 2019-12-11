@@ -1,7 +1,4 @@
 # Telegram-CMS v.0.3.2 alpha
-[![Download](https://poser.pugx.org/ali-irawan/xtra/d/total.svg)](https://poser.pugx.org/ali-irawan/xtra/d/total.svg)
-[![Stable](https://poser.pugx.org/ali-irawan/xtra/v/stable.svg)](https://poser.pugx.org/ali-irawan/xtra/v/stable.svg)
-[![Unstable](https://poser.pugx.org/ali-irawan/xtra/v/unstable.svg)](https://poser.pugx.org/ali-irawan/xtra/v/unstable.svg)
 
 ![img](http://dl3.joxi.net/drive/2019/12/06/0029/3762/1904306/06/08fa2e0135.jpg)
 
