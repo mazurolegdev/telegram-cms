@@ -1,4 +1,4 @@
-# Telegram-CMS v.0.3. alpha
+# Telegram-CMS v.0.3.1 alpha
 - Based on Opencluster https://opencluster-hub.github.io/opencluster/
 
 ![img](http://dl3.joxi.net/drive/2019/12/06/0029/3762/1904306/06/08fa2e0135.jpg)
