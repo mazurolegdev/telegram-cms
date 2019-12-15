@@ -1,6 +1,6 @@
 from django.contrib import admin
 from apps.telegram.models import (
-    Config, Message, Chat, TelegramUser, Trigger, Scene, ChatListener
+    Config, Message, Chat, TelegramUser, Trigger, Scene, ChatListener, DialogueListener
 )
 from django.http import HttpResponseRedirect
 from apps.telegram.tasks import Group
@@ -38,6 +38,10 @@ class SceneAdmin(admin.ModelAdmin):
 
 @admin.register(ChatListener)
 class ChatListenerAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(DialogueListener)
+class DialogueListenerAdmin(admin.ModelAdmin):
     pass
 
 

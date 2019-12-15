@@ -25,7 +25,7 @@ SECRET_KEY = 'pd9g8r&z=&o4o1h#_*=bi826_=fu#@zq8le1553cpjq6cs&sw6'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-LOCAL = False
+LOCAL = True
 
 if not LOCAL:
     from main.utils import get_config

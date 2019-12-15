@@ -182,6 +182,85 @@ class Telegram:
 
         @self.app.on_message()
         def message_handler(client, message):
+            print(message)
+            '''
+                                    {
+                async.core      |     "_": "pyrogram.Message",
+                async.core      |     "message_id": 52,
+                async.core      |     "date": "2019-12-11 14:37:57",
+                async.core      |     "chat": {
+                async.core      |         "_": "pyrogram.Chat",
+                async.core      |         "id": -1001294234578,
+                async.core      |         "type": "supergroup",
+                async.core      |         "is_verified": false,
+                async.core      |         "is_restricted": false,
+                async.core      |         "is_scam": false,
+                async.core      |         "title": "Mew mew cats",
+                async.core      |         "username": "mewmewcats",
+                async.core      |         "permissions": {
+                async.core      |             "_": "pyrogram.ChatPermissions",
+                async.core      |             "can_send_messages": true,
+                async.core      |             "can_send_media_messages": true,
+                async.core      |             "can_send_other_messages": true,
+                async.core      |             "can_add_web_page_previews": true,
+                async.core      |             "can_send_polls": true,
+                async.core      |             "can_change_info": false,
+                async.core      |             "can_invite_users": true,
+                async.core      |             "can_pin_messages": false
+                async.core      |         }
+                async.core      |     },
+                async.core      |     "from_user": {
+                async.core      |         "_": "pyrogram.User",
+                async.core      |         "id": 889996703,
+                async.core      |         "is_self": true,
+                async.core      |         "is_contact": false,
+                async.core      |         "is_mutual_contact": false,
+                async.core      |         "is_deleted": false,
+                async.core      |         "is_bot": false,
+                async.core      |         "is_verified": false,
+                async.core      |         "is_restricted": false,
+                async.core      |         "is_scam": false,
+                async.core      |         "is_support": false,
+                async.core      |         "first_name": "Апчхи",
+                async.core      |         "status": "online",
+                async.core      |         "next_offline_date": "2019-12-11 14:42:43",
+                async.core      |         "username": "aaaaaaaapchi",
+                async.core      |         "phone_number": "***********"
+                async.core      |     },
+                async.core      |     "mentioned": false,
+                async.core      |     "scheduled": false,
+                async.core      |     "from_scheduled": false,
+                async.core      |     "media": true,
+                async.core      |     "photo": {
+                async.core      |         "_": "pyrogram.Photo",
+                async.core      |         "file_id": "AgADAgADbawxG2r0iEsD5etIC9BKM7yywg8ABAEAAwIAA3kAA9bJAAIWBA",
+                async.core      |         "file_ref": "BE0kc9IAAAA0XfFTpWZMm8I7UFlfxfbGRYHIpZk",
+                async.core      |         "width": 862,
+                async.core      |         "height": 1080,
+                async.core      |         "file_size": 152766,
+                async.core      |         "date": "2019-12-11 14:34:38",
+                async.core      |         "thumbs": [
+                async.core      |             {
+                async.core      |                 "_": "pyrogram.Thumbnail",
+                async.core      |                 "file_id": "AgADAgADbawxG2r0iEsD5etIC9BKM7yywg8ABAEAAwIAA20AA9jJAAIWBA",
+                async.core      |                 "width": 256,
+                async.core      |                 "height": 320,
+                async.core      |                 "file_size": 21119
+                async.core      |             },
+                async.core      |             {
+                async.core      |                 "_": "pyrogram.Thumbnail",
+                async.core      |                 "file_id": "AgADAgADbawxG2r0iEsD5etIC9BKM7yywg8ABAEAAwIAA3gAA9nJAAIWBA",
+                async.core      |                 "width": 639,
+                async.core      |                 "height": 800,
+                async.core      |                 "file_size": 100745
+                async.core      |             }
+                async.core      |         ]
+                async.core      |     },
+                async.core      |     "caption": "здесь какая то подпись",
+                async.core      |     "outgoing": true
+                async.core      | 
+                                    }
+            '''
             result = parse_message(message)
             result.update({
                 "id": self.django_config_id,

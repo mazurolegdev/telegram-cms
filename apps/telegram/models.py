@@ -741,14 +741,7 @@ class Scene(models.Model):
         verbose_name = 'scene'
         verbose_name_plural = 'scenes'
 
-
-class BaseChatListener(models.Model):
-
-    LISTENER_CHOICES = (
-        ("DefaultChatListener", "Default Chat Listener"),
-        # ("DefaultPostListener", "Default Post Listener"),
-    )
-
+class BaseListener(models.Model):
     app = models.ForeignKey(
         "telegram.Config",
         on_delete=models.deletion.SET_NULL,
@@ -757,16 +750,6 @@ class BaseChatListener(models.Model):
         blank=True,
         verbose_name='Application'
     )
-
-    listener_type = models.CharField(
-        max_length=255,
-        choices=LISTENER_CHOICES,
-        default=None,
-        null=True,
-        blank=False,
-        verbose_name='Type'
-    )
-
     is_enabled = models.BooleanField(
         default=False,
         null=True,
@@ -794,6 +777,21 @@ class BaseChatListener(models.Model):
         null=True,
     )
 
+class BaseDialogueListener(BaseListener):
+    LISTENER_CHOICES = (
+        ("DefaultDialogueListener", "Default Dialogue Listener"),
+        # ("DefaultPostListener", "Default Post Listener"),
+    )
+
+    listener_type = models.CharField(
+        max_length=255,
+        choices=LISTENER_CHOICES,
+        default=None,
+        null=True,
+        blank=False,
+        verbose_name='Type'
+    )
+
     def get_listener_module(self):
         return import_module('apps.telegram.listeners')
 
@@ -803,8 +801,73 @@ class BaseChatListener(models.Model):
         return listener
 
     class Meta:
-        verbose_name = 'listener'
-        verbose_name_plural = 'listeners'
+        verbose_name = 'base dialogue listener'
+        verbose_name_plural = 'base dialogues listeners'
+
+class DialogueListener(BaseDialogueListener):
+
+    to_chat = models.ForeignKey(
+        "telegram.Chat",
+        on_delete=models.deletion.SET_NULL,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name='To chat'
+    )
+
+    # is_need_account_transfer = models.BooleanField(
+    #     default=False,
+    #     null=True,
+    #     blank=True,
+    #     verbose_name='If need transfer incoming message to another account wich make publish current message.'
+    # )
+    #
+    # transfer_to_account = models.ForeignKey(
+    #     "telegram.Config",
+    #     on_delete=models.deletion.SET_NULL,
+    #     default=None,
+    #     null=True,
+    #     blank=True,
+    #     verbose_name='Transfer to account. Choose it if need transfer message to another account wich make publish.'
+    # )
+
+
+
+    def __str__(self):
+        return f"ID: {self.id}, to: {self.to_chat}"
+
+    class Meta:
+        verbose_name = 'dialogue listener'
+        verbose_name_plural = 'dialogues listeners'
+
+class BaseChatListener(BaseListener):
+
+    LISTENER_CHOICES = (
+        ("DefaultChatListener", "Default Chat Listener"),
+        # ("DefaultPostListener", "Default Post Listener"),
+    )
+
+    listener_type = models.CharField(
+        max_length=255,
+        choices=LISTENER_CHOICES,
+        default=None,
+        null=True,
+        blank=False,
+        verbose_name='Type'
+    )
+
+
+    def get_listener_module(self):
+        return import_module('apps.telegram.listeners')
+
+    def get_listener(self):
+        listener_module = self.get_listener_module()
+        listener = getattr(listener_module, str(self.listener_type))
+        return listener
+
+    class Meta:
+        verbose_name = 'base chat listener'
+        verbose_name_plural = 'base chats listeners'
 
 
 class ChatListener(BaseChatListener):
@@ -828,13 +891,6 @@ class ChatListener(BaseChatListener):
         verbose_name='To chat'
     )
 
-    # messages = models.ManyToManyField(
-    #     "telegram.Message",
-    #     default=None,
-    #     blank=True,
-    #     verbose_name='Messages',
-    #     help_text='*mark as non editable field'
-    # )
 
     def __str__(self):
         return f"ID: {self.id}, from: {self.from_chat}, to: {self.to_chat}"

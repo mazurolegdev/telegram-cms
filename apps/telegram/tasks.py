@@ -3,7 +3,7 @@ import json
 from django.conf import settings
 from django.utils.datastructures import MultiValueDictKeyError
 
-from apps.telegram.models import Config, Scene, ChatListener, Chat
+from apps.telegram.models import Config, Scene, ChatListener, Chat, DialogueListener
 from apps.telegram.utils import telegram_logger, DataCleaner, Sender
 from main.celery import app
 
@@ -35,8 +35,6 @@ class Group:
                 tg_chat_title=str(data['title']),
                 tg_chat_username=str(data['username'])
             )
-        print(chat)
-
 
     @staticmethod
     @app.task()
@@ -54,16 +52,32 @@ class Group:
         for group in json.loads(groups):
             Group.create_group(group)
 
+class DialogueListenerTasks:
+
+    @staticmethod
+    @app.task()
+    def default_dialogue_listener_task(data):
+        app = TriggerMiddlewareTasks.get_app(data)
+        dialogue_listeners = DialogueListener.objects.filter(
+            app=app,
+            is_enabled=True,
+        )
+
+        if dialogue_listeners:
+            for listener in dialogue_listeners:
+                if listener.is_enabled and listener.auto_publishing_is_enabled:
+                    response_data = DataCleaner.clean_response_chat_data(data, listener, with_text=True)
+                    Sender.send_message(response_data)
 
 class ChatListenerTasks:
+
     @staticmethod
     @app.task()
     def default_chat_listener_task(data):
         try:
-            chat_id = data['chat_id']
-            chat_username = data['chat_username']
-            chat_type = data['chat_type']
-            text = data['text']
+            chat_id, chat_username, chat_type, text = (
+                data['chat_id'], data['chat_username'], data['chat_type'], data['text']
+            )
         except MultiValueDictKeyError:
             telegram_logger(f"MultiValueDictKeyError at data: {data}", 'ChatListenerTasks')
             return 1
@@ -73,8 +87,7 @@ class ChatListenerTasks:
         for listener in listeners:
             if listener.auto_publishing_is_enabled:
                 if str(chat_id) == str(listener.from_chat.tg_chat_id):
-                    response_data = DataCleaner.clean_response_chat_data(data, listener)
-                    response_data.update({"text": data['text']})
+                    response_data = DataCleaner.clean_response_chat_data(data, listener, with_text=True)
                     Sender.send_message(response_data)
 
 

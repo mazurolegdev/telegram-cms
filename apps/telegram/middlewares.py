@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from apps.telegram.models import ChatListener, Config
 from apps.telegram.utils import telegram_logger, Sender, DataCleaner
 from apps.telegram.api.serializers import ConfigSerializer
-from apps.telegram.tasks import TriggerMiddlewareTasks, ChatListenerTasks
+from apps.telegram.tasks import TriggerMiddlewareTasks, ChatListenerTasks, DialogueListenerTasks
 
 
 class RequestsMiddleware:
@@ -91,22 +91,33 @@ class ListenerMiddleware:
         self.logger = telegram_logger
         self.listener_task = ChatListenerTasks()
         self.trigger_task = TriggerMiddlewareTasks()
+        self.dialogue_task = DialogueListenerTasks()
 
     def message(self, func):
         def wrapper(request, *args, **kwargs):
             if request.data['chat_type'] == 'private':
                 self.logger(f"Catch private message", self)
 
+                # Run dialogue-listener task
+                try:
+                    self.dialogue_task.default_dialogue_listener_task.delay(request.data)
+
+                except MultiValueDictKeyError:
+                    return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+                # Run trigger task
                 try:
                     self.trigger_task.private_pre_task.delay(request.data)
 
                     # here you can do what ever you want
 
-                    self.trigger_task.private_post_task.delay()
-                    return func(request, *args, **kwargs)
+                    # for customize
+                    # self.trigger_task.private_post_task.delay()
 
                 except MultiValueDictKeyError:
                     return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+                return func(request, *args, **kwargs)
 
             elif request.data['chat_type'] != 'private':
                 self.logger(f"Catch non private message", self)

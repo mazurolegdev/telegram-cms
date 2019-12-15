@@ -24,8 +24,8 @@ class Sender:
 class DataCleaner:
 
     @staticmethod
-    def clean_response_chat_data(data, listener):
-        return {
+    def clean_response_chat_data(data, listener, with_text=None):
+        response = {
             "id_to": str(listener.to_chat.tg_chat_id),
             "session_name": data['session_name'],
             "app_id": data['app_id'],
@@ -33,6 +33,11 @@ class DataCleaner:
             "session_string": str(listener.app.session_string),
             "is_bot_session": data['is_bot_session']
         }
+        if with_text:
+            response.update({
+                "text": data['text'],
+            })
+        return response
 
 
 
