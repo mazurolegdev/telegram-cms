@@ -41,10 +41,9 @@ class Group:
     def get_groups(app_id: int):
         '''
         {'is_bot_session': False,
-        'app_id': 1116803,
-        'session_name': 'netcraft_session',
-        'session_string': 'AgBpeooUViRREXOS0BNRtcAPLpNLc7cuv2f29DjSbfXYFLs6zDIZRUJCcJi5V5KAux\
-        AfzMwsbXWdcM4dROdztHTzxOrVcR8AMg8lLZLnNzfvhEy5iAXvlZFxzJJo9YnIchllud'}
+        'app_id': int,
+        'session_name': 'your_session',
+        'session_string': 'string'}
         '''
         app = Config.objects.get(id=app_id)
         groups = Sender.get_groups(app)
